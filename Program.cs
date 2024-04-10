@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +51,9 @@ internal class Program
         //add authentication and identity API endpoints - Changes
         builder.Services.AddAuthentication();
 
-        builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<HMSDBContext>();
+        builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<HMSDBContext>();
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
@@ -70,7 +72,8 @@ internal class Program
         app.UseSwaggerUI();
 
         //map Identity APIs - Changes
-        app.MapIdentityApi<AppUser>();
+        //app.MapIdentityApi<AppUser>(); - not using App user-remove it
+        app.MapIdentityApi<IdentityUser>();
 
         app.UseHttpsRedirection();
 
@@ -92,7 +95,53 @@ internal class Program
             FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath,"Uploads")),
             RequestPath = "/Resources"
         });
-        app.Run();
+
+
+        //add role data seeding to app
+        using (var scope = app.Services.CreateScope())
+        {
+            try
+            {
+
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                var roles = new[] { "Admin", "User", "Member" };
+
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            string email = "admin@admin.com";
+            string password = "Test1234@";
+
+            if (await userManager.FindByEmailAsync(email) == null)
+            {
+                var user = new IdentityUser();
+                user.UserName = email;
+                user.Email = email;
+
+                await userManager.CreateAsync(user, password);
+
+                await userManager.AddToRoleAsync(user, "Admin");
+            }
+
+        }
+
+            app.Run();
     }
 }
 

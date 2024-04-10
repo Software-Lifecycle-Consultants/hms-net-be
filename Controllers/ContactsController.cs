@@ -14,13 +14,13 @@ namespace HMS.Controllers
     [ApiController]
     public class ContactsController : ControllerBase
     {
-        private readonly HMSDBContext _context;
+        private readonly HMSDBContext _dbContext;
         private readonly ILogger<ContactsController> _logger;
         private readonly IRepositoryService<Contact> _repositoryService;
 
         public ContactsController(HMSDBContext context, ILogger<ContactsController> logger, IRepositoryService<Contact> repositoryService)
         {
-            _context = context;
+            _dbContext = context;
             _logger = logger;
             _repositoryService = repositoryService;
         }
@@ -107,7 +107,7 @@ namespace HMS.Controllers
 
         //private bool ContactExists(int id)
         //{
-        //    return _context.Contacts.Any(e => e.Id == id);
+        //    return _dbContext.Contacts.Any(e => e.Id == id);
         //}
     }
 }
