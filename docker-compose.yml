@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: P@ssw0rd
+      MYSQL_DATABASE: HMSDB
+      MYSQL_PASSWORD: P@ssw0rd
+    ports:
+      - "33061:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7041:7041"
+      - "5010:5010"
+    depends_on:
+      - mysql
+    environment:
+    - ASPNETCORE_URLS=http://+:7041
+
+volumes:
+  mysql_data:
+
+
