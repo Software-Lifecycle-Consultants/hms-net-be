@@ -89,6 +89,12 @@ internal class Program
             .AllowAnyMethod();
         }
         );
+
+        // Ensure Uploads directory exists
+         var uploadsPath = Path.Combine(builder.Environment.ContentRootPath,"Uploads");
+         if(!Directory.Exists(uploadsPath))
+             Directory.CreateDirectory(uploadsPath);
+
         //access image files
         app.UseStaticFiles(new StaticFileOptions
         { 
@@ -97,49 +103,49 @@ internal class Program
         });
 
 
-        //add role data seeding to app
-        using (var scope = app.Services.CreateScope())
-        {
-            try
-            {
+        // //add role data seeding to app
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     try
+        //     {
 
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        //         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                var roles = new[] { "Admin", "User", "Member" };
+        //         var roles = new[] { "Admin", "User", "Member" };
 
-                foreach (var role in roles)
-                {
-                    if (!await roleManager.RoleExistsAsync(role))
-                        await roleManager.CreateAsync(new IdentityRole(role));
-                }
-            }
-            catch (Exception)
-            {
+        //         foreach (var role in roles)
+        //         {
+        //             if (!await roleManager.RoleExistsAsync(role))
+        //                 await roleManager.CreateAsync(new IdentityRole(role));
+        //         }
+        //     }
+        //     catch (Exception)
+        //     {
 
-                throw;
-            }
+        //         throw;
+        //     }
 
-        }
+        // }
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-            string email = "admin@admin.com";
-            string password = "Test1234@";
+        //     string email = "admin@admin.com";
+        //     string password = "Test1234@";
 
-            if (await userManager.FindByEmailAsync(email) == null)
-            {
-                var user = new IdentityUser();
-                user.UserName = email;
-                user.Email = email;
+        //     if (await userManager.FindByEmailAsync(email) == null)
+        //     {
+        //         var user = new IdentityUser();
+        //         user.UserName = email;
+        //         user.Email = email;
 
-                await userManager.CreateAsync(user, password);
+        //         await userManager.CreateAsync(user, password);
 
-                await userManager.AddToRoleAsync(user, "Admin");
-            }
+        //         await userManager.AddToRoleAsync(user, "Admin");
+        //     }
 
-        }
+        // }
 
             app.Run();
     }
