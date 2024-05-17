@@ -26,8 +26,22 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/HMS.pfx
     volumes:
       - ~/.aspnet/https:/https:ro
+    # 
+    
+  migrate-database:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    environment:
+      - ConnectionStrings__DefaultConnection="Server=mysql;Database=HMSDB;User=root;Password=P@ssw0rd;"
+    command: >
+      sh -c "
+        dotnet tool install --global dotnet-ef --version 8.0.0 &&
+        export PATH=$PATH:/root/.dotnet/tools &&
+        dotnet ef database update HMS.csproj"
+    restart: "no"
 
 volumes:
   mysql_data:
-
-

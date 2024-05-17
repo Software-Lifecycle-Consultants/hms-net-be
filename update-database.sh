@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Run database migration
-dotnet ef database update --context HMSDBContext
+# Wait for the MySQL server to be up and running
+until /opt/mssql-tools/bin/sqlcmd -S mysql -U root -P 'P@ssw0rd' -Q 'SELECT 1' > /dev/null 2>&1; do
+    echo "Waiting for MySQL server to start..."
+    sleep 5
+done
 
-# Start the application
-dotnet HMS.dll --environment=Development
+echo "Applying database migrations..."
+dotnet ef database update
+
+
+
