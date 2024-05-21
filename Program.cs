@@ -2,10 +2,13 @@ using HMS.Models;
 using HMS.Services.FileService;
 using HMS.Services.Repository_Service;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
+using Polly;
 using Swashbuckle.AspNetCore.Filters;
 
 internal class Program
@@ -102,52 +105,74 @@ internal class Program
             RequestPath = "/Resources"
         });
 
+        try
+        {
+            //Using Polly Nuget Package:Polly is a .NET resilience and transient-fault-handling library that allows you to express policies such as Retry, Circuit Breaker, Timeout, Bulkhead Isolation, and Fallback.
+            //Install Polly.Extensions.Http :it provides support for asynchronous policies
 
-        // //add role data seeding to app
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     try
-        //     {
+            // Retry policy for ensuring the database is ready
+            var retryPolicy = Policy
+                .Handle<MySqlException>()
+                .WaitAndRetryAsync(50, retryAttempt =>
+                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+               
 
-        //         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await retryPolicy.ExecuteAsync(async () =>
+            {
+                // //add role data seeding to app
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
 
-        //         var roles = new[] { "Admin", "User", "Member" };
+                        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        //         foreach (var role in roles)
-        //         {
-        //             if (!await roleManager.RoleExistsAsync(role))
-        //                 await roleManager.CreateAsync(new IdentityRole(role));
-        //         }
-        //     }
-        //     catch (Exception)
-        //     {
+                        var roles = new[] { "Admin", "User", "Member" };
 
-        //         throw;
-        //     }
+                        foreach (var role in roles)
+                        {
+                            if (!await roleManager.RoleExistsAsync(role))
+                                await roleManager.CreateAsync(new IdentityRole(role));
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
 
-        // }
+                }
 
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                using (var scope = app.Services.CreateScope())
+                {
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        //     string email = "admin@admin.com";
-        //     string password = "Test1234@";
+                    string email = "admin@admin.com";
+                    string password = "Test1234@";
 
-        //     if (await userManager.FindByEmailAsync(email) == null)
-        //     {
-        //         var user = new IdentityUser();
-        //         user.UserName = email;
-        //         user.Email = email;
+                    if (await userManager.FindByEmailAsync(email) == null)
+                    {
+                        var user = new IdentityUser();
+                        user.UserName = email;
+                        user.Email = email;
 
-        //         await userManager.CreateAsync(user, password);
+                        await userManager.CreateAsync(user, password);
 
-        //         await userManager.AddToRoleAsync(user, "Admin");
-        //     }
+                        await userManager.AddToRoleAsync(user, "Admin");
+                    }
 
-        // }
+                }
+            });
+        }
+        catch (Exception)
+        {
+            throw;
+            //handle later with logging
+            //"An error occurred while migrating or seeding the database."
+        }
 
-            app.Run();
+
+
+        app.Run();
     }
 }
 
