@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HMS.Models;
 using HMS.Services.Repository_Service;
+using HMS.DTOs;
+using AutoMapper;
 
 namespace HMS.Controllers
 {
@@ -17,12 +19,14 @@ namespace HMS.Controllers
         private readonly HMSDBContext _dbContext;
         private readonly ILogger<ContactsController> _logger;
         private readonly IRepositoryService<Contact> _repositoryService;
+        private readonly IMapper _mapper;
 
-        public ContactsController(HMSDBContext context, ILogger<ContactsController> logger, IRepositoryService<Contact> repositoryService)
+        public ContactsController(HMSDBContext context, ILogger<ContactsController> logger, IRepositoryService<Contact> repositoryService, IMapper mapper)
         {
             _dbContext = context;
             _logger = logger;
             _repositoryService = repositoryService;
+            _mapper = mapper;
         }
 
 
@@ -84,8 +88,12 @@ namespace HMS.Controllers
         // POST: api/Contacts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Contact>> PostContact(Contact contact)
+        public async Task<ActionResult<Contact>> PostContact(ContactDTO contactDto)
         {
+
+            Contact contact = _mapper.Map<Contact>(contactDto);          
+
+            
             await _repositoryService.InsertAsync(contact);         
 
             return CreatedAtAction("GetContact", new { id = contact.Id }, contact);
