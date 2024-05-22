@@ -119,6 +119,23 @@ internal class Program
 
             await retryPolicy.ExecuteAsync(async () =>
             {
+              
+
+                //Apply DB migrations
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
+                        var context = scope.ServiceProvider.GetRequiredService<HMSDBContext>();
+                        await context.Database.MigrateAsync(); // Apply migrations
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                }
+
                 // //add role data seeding to app
                 using (var scope = app.Services.CreateScope())
                 {
