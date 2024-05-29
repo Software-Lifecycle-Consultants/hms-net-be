@@ -1,46 +1,50 @@
 ﻿using HMS.Models;
+using HMS.Models.Admin;
+using HMS.Services.Repository_Service;
 using Microsoft.EntityFrameworkCore;
 
-namespace HMS.Services.Repository_Service
+namespace HMS.Services.RepositoryService
 {
-    public class ContactsRepositoryService : RepositoryServiceBase<Contact, ContactsRepositoryService>, IRepositoryService<Contact>
+    public class AdminRoomRepositoryService : RepositoryServiceBase<AdminRoom,AdminRoomRepositoryService>, IRepositoryService<AdminRoom>
     {
-        public ContactsRepositoryService(HMSDBContext context, ILogger<ContactsRepositoryService> logger) : base(context, logger)
+        public AdminRoomRepositoryService(HMSDBContext context,ILogger<AdminRoomRepositoryService> logger) : base(context, logger)
         {
-
         }
-        public async Task DeleteAsync(Contact dbObject)
+
+        public async Task DeleteAsync(AdminRoom dbObject)
         {
             try
             {
-                DbContext.Contacts.Remove(dbObject);
+                DbContext.AdminRooms.Remove(dbObject);
                 await SaveAsync();
             }
             catch (Exception ex)
             {
+
                 RepoLogger.LogError("Exception at DeleteAsync: {0}", ex.Message);
 
             }
         }
 
-        public async Task<IEnumerable<Contact>> GetAllAsync()
+        public async Task<IEnumerable<AdminRoom>> GetAllAsync()
         {
             try
             {
-                return await DbContext.Contacts.ToListAsync();
+                return await DbContext.AdminRooms.ToListAsync();
             }
             catch (Exception ex)
             {
+
                 RepoLogger.LogError("Exception at GetAllAsync: {0}", ex.Message);
                 throw;
             }
         }
 
-        public async Task<Contact?> GetByIdAsync(Guid id)
+        public async Task<AdminRoom?> GetByIdAsync(Guid id)
         {
             try
             {
-                return await DbContext.Contacts.FindAsync(id);
+                return await DbContext.AdminRooms.FindAsync(id);
             }
             catch (Exception ex)
             {
@@ -49,17 +53,16 @@ namespace HMS.Services.Repository_Service
             }
         }
 
-        public async Task InsertAsync(Contact dbObject)
+        public async Task InsertAsync(AdminRoom dbObject)
         {
             try
             {
-                await DbContext.Contacts.AddAsync(dbObject);
+               await DbContext.AdminRooms.AddAsync(dbObject);
                 await SaveAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                RepoLogger.LogError("Exception at InsertAsync: {0}", ex.Message);
                 throw;
             }
         }
@@ -68,7 +71,7 @@ namespace HMS.Services.Repository_Service
         {
             try
             {
-                return await DbContext.Contacts.AnyAsync(e => e.Id == id);
+                return await DbContext.AdminRooms.AnyAsync(e => e.Id == id);
             }
             catch (Exception ex)
             {
@@ -78,6 +81,5 @@ namespace HMS.Services.Repository_Service
             }
         }
 
-
-    }
+            }
 }

@@ -1,11 +1,16 @@
 using HMS.Models;
+using HMS.Models.Admin;
 using HMS.Services.FileService;
 using HMS.Services.Repository_Service;
+using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
+using Polly;
 using Swashbuckle.AspNetCore.Filters;
 
 internal class Program
@@ -32,6 +37,8 @@ internal class Program
             });
 
             options.OperationFilter<SecurityRequirementsOperationFilter>();
+            // Register a custom operation filter to handle FromForm parameters (nested objects)
+            options.OperationFilter<FromFormOperationFilter>();
         });
 
         // builder.Services.AddDbContext<HMSDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -40,7 +47,7 @@ internal class Program
         builder.Services.AddDbContext<HMSDBContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         builder.Services.AddAutoMapper(typeof(Program));
 
-        builder.Services.AddLogging();
+        builder.Services.AddLogging(); //registers logging services with the dependency injection container, allowing the application to use logging
         //configuring logging
         builder.Logging.ClearProviders();//clear microsoft defaults
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); //get appsettings configs
@@ -56,6 +63,7 @@ internal class Program
             .AddEntityFrameworkStores<HMSDBContext>();
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<AdminRoom>, AdminRoomRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
@@ -71,8 +79,7 @@ internal class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        //map Identity APIs - Changes
-        //app.MapIdentityApi<AppUser>(); - not using App user-remove it
+        //map Identity APIs - Changes        
         app.MapIdentityApi<IdentityUser>();
 
         app.UseHttpsRedirection();
@@ -102,52 +109,92 @@ internal class Program
             RequestPath = "/Resources"
         });
 
+        try
+        {
+            //Using Polly Nuget Package:Polly is a .NET resilience and transient-fault-handling library that allows you to express policies such as Retry, Circuit Breaker, Timeout, Bulkhead Isolation, and Fallback.
+            //Install Polly.Extensions.Http :it provides support for asynchronous policies
+            //https://www.nuget.org/packages/polly/
 
-        // //add role data seeding to app
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     try
-        //     {
+            // Retry policy for ensuring the database is ready
+            var retryPolicy = Policy
+                .Handle<MySqlException>()
+                .WaitAndRetryAsync(50, retryAttempt =>
+                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+               
 
-        //         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            await retryPolicy.ExecuteAsync(async () =>
+            {
+              
 
-        //         var roles = new[] { "Admin", "User", "Member" };
+                //Apply DB migrations
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
+                        var context = scope.ServiceProvider.GetRequiredService<HMSDBContext>();
+                        await context.Database.MigrateAsync(); // Apply migrations
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
 
-        //         foreach (var role in roles)
-        //         {
-        //             if (!await roleManager.RoleExistsAsync(role))
-        //                 await roleManager.CreateAsync(new IdentityRole(role));
-        //         }
-        //     }
-        //     catch (Exception)
-        //     {
+                }
 
-        //         throw;
-        //     }
+                // //add role data seeding to app
+                using (var scope = app.Services.CreateScope())
+                {
+                    try
+                    {
 
-        // }
+                        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                        var roles = new[] { "Admin", "User", "Member" };
 
-        //     string email = "admin@admin.com";
-        //     string password = "Test1234@";
+                        foreach (var role in roles)
+                        {
+                            if (!await roleManager.RoleExistsAsync(role))
+                                await roleManager.CreateAsync(new IdentityRole(role));
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
 
-        //     if (await userManager.FindByEmailAsync(email) == null)
-        //     {
-        //         var user = new IdentityUser();
-        //         user.UserName = email;
-        //         user.Email = email;
+                }
 
-        //         await userManager.CreateAsync(user, password);
+                using (var scope = app.Services.CreateScope())
+                {
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        //         await userManager.AddToRoleAsync(user, "Admin");
-        //     }
+                    string email = "admin@admin.com";
+                    string password = "Test1234@";
 
-        // }
+                    if (await userManager.FindByEmailAsync(email) == null)
+                    {
+                        var user = new IdentityUser();
+                        user.UserName = email;
+                        user.Email = email;
 
-            app.Run();
+                        await userManager.CreateAsync(user, password);
+
+                        await userManager.AddToRoleAsync(user, "Admin");
+                    }
+
+                }
+            });
+        }
+        catch (Exception)
+        {
+            throw;
+            //handle later with logging
+            //"An error occurred while migrating or seeding the database."
+        }
+
+
+
+        app.Run();
     }
 }
 
