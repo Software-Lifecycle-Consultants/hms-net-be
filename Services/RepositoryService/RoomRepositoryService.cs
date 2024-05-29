@@ -4,9 +4,9 @@ using Microsoft.Identity.Client;
 
 namespace HMS.Services.Repository_Service
 {
-    public class RoomRepositoryService : RepositoryServiceBase<Room>, IRepositoryService<Room>
+    public class RoomRepositoryService : RepositoryServiceBase<Room, RoomRepositoryService>, IRepositoryService<Room>
     {
-        public RoomRepositoryService(HMSDBContext context) : base(context)
+        public RoomRepositoryService(HMSDBContext context, ILogger<RoomRepositoryService> logger) : base(context,logger)
         {
         }
 
@@ -38,7 +38,7 @@ namespace HMS.Services.Repository_Service
             }
         }
 
-        public async Task<Room?> GetByIdAsync(long id)
+        public async Task<Room?> GetByIdAsync(Guid id)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace HMS.Services.Repository_Service
             }
         }
 
-        public async Task<bool> ItemExistsAsync(long id)
+        public async Task<bool> ItemExistsAsync(Guid id)
         {
             try
             {
@@ -78,31 +78,7 @@ namespace HMS.Services.Repository_Service
             }
         }
 
-        public async Task SaveAsync()
-        {
-            try
-            {
-                await DbContext.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-
-        public void Update(Room dbObject)
-        {
-            try
-            {
-                DbContext.Entry(dbObject).State = EntityState.Modified;
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
+       
 
     }
 }

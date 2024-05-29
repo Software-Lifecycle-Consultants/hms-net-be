@@ -1,6 +1,8 @@
 using HMS.Models;
+using HMS.Models.Admin;
 using HMS.Services.FileService;
 using HMS.Services.Repository_Service;
+using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +37,8 @@ internal class Program
             });
 
             options.OperationFilter<SecurityRequirementsOperationFilter>();
+            // Register a custom operation filter to handle FromForm parameters (nested objects)
+            options.OperationFilter<FromFormOperationFilter>();
         });
 
         // builder.Services.AddDbContext<HMSDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -43,7 +47,7 @@ internal class Program
         builder.Services.AddDbContext<HMSDBContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         builder.Services.AddAutoMapper(typeof(Program));
 
-        builder.Services.AddLogging();
+        builder.Services.AddLogging(); //registers logging services with the dependency injection container, allowing the application to use logging
         //configuring logging
         builder.Logging.ClearProviders();//clear microsoft defaults
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging")); //get appsettings configs
@@ -59,6 +63,7 @@ internal class Program
             .AddEntityFrameworkStores<HMSDBContext>();
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<AdminRoom>, AdminRoomRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
@@ -74,8 +79,7 @@ internal class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        //map Identity APIs - Changes
-        //app.MapIdentityApi<AppUser>(); - not using App user-remove it
+        //map Identity APIs - Changes        
         app.MapIdentityApi<IdentityUser>();
 
         app.UseHttpsRedirection();
@@ -109,6 +113,7 @@ internal class Program
         {
             //Using Polly Nuget Package:Polly is a .NET resilience and transient-fault-handling library that allows you to express policies such as Retry, Circuit Breaker, Timeout, Bulkhead Isolation, and Fallback.
             //Install Polly.Extensions.Http :it provides support for asynchronous policies
+            //https://www.nuget.org/packages/polly/
 
             // Retry policy for ensuring the database is ready
             var retryPolicy = Policy

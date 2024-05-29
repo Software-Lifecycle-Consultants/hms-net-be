@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace HMS.Models.Admin
 {
@@ -15,6 +16,7 @@ namespace HMS.Models.Admin
         [ForeignKey("AdminRoom")]
         public Guid? AdminRoomId { get; set; }
 
+        [JsonIgnore] // Prevent circular reference in Swagger documentation
         public AdminRoom AdminRoom { get; set; } = new AdminRoom();
     }
 }

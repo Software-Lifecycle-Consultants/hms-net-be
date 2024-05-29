@@ -40,7 +40,7 @@ namespace HMS.Controllers
 
         // GET: api/Rooms/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Room>> GetRoom(int id)
+        public async Task<ActionResult<Room>> GetRoom(Guid id)
         {
             var room = await _roomRepositoryService.GetByIdAsync(id);
 
@@ -55,7 +55,7 @@ namespace HMS.Controllers
         // PUT: api/Rooms/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRoom(int id, Room room)
+        public async Task<IActionResult> PutRoom(Guid id, Room room)
         {
             if (id != room.Id)
             {
@@ -125,7 +125,7 @@ namespace HMS.Controllers
 
         // DELETE: api/Rooms/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRoom(int id)
+        public async Task<IActionResult> DeleteRoom(Guid id)
         {
             var room = await _roomRepositoryService.GetByIdAsync(id);
             if (room == null)
