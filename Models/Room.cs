@@ -6,7 +6,7 @@ namespace HMS.Models
     public class Room
     {
         [ Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [MaxLength(50)]
         public string Title { get; set; } = String.Empty;
