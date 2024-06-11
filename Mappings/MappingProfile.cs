@@ -20,8 +20,11 @@ namespace HMS.Mappings
             CreateMap<RoleDTO, IdentityRole>().ReverseMap();
 
             //Admin
-            CreateMap<AdminRoomDTO,AdminRoom>().ReverseMap();
-          
+            CreateMap<AdminRoomDTO, AdminRoom>().ReverseMap();
+            CreateMap<AdminCategoryDTO, AdminCategory>().ReverseMap();
+            CreateMap<AdminServiceAddonDTO, AdminServiceAddon>().ReverseMap();
+            CreateMap<AdminAdditionalInfoDTO, AdminAdditionalInfo>().ReverseMap();
+
         }
     }
 }
