@@ -17,6 +17,7 @@ namespace HMS.Models.Admin
         public string? Subtitle { get; set; }
 
         [Required]
+        [NotMapped]
         public IFormFile? CoverImage { get; set; } 
 
         [Required]
@@ -38,6 +39,7 @@ namespace HMS.Models.Admin
         public string? AuthorDescription { get; set; }
 
         [Required]
+        [NotMapped]
         public IFormFile? AuthorImage { get; set; } 
 
         [Required]
