@@ -5,7 +5,6 @@ namespace HMS.DTOs.Admin
 {
     public class AdminBlogDTO
     {
-        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]
@@ -17,18 +16,17 @@ namespace HMS.DTOs.Admin
         public string? Subtitle { get; set; }
 
         [Required]
-        [NotMapped]
-        public IFormFile? CoverImage { get; set; }
-
-        [Required]
-        public DateTime PublishedTime { get; set; }
-
-        [Required]
         public List<string> Tags { get; set; } = [];
 
         [Required]
         [MinLength(10, ErrorMessage = "The content must be more 10 than characters.")]
         public string BlogContent { get; set; } = string.Empty;
+
+        [Required]
+        public IFormFile? CoverImage { get; set; }
+
+        [Required]
+        public IFormFile? AuthorImage { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "The Author Name must be between 3 and 50 characters.")]
@@ -37,10 +35,6 @@ namespace HMS.DTOs.Admin
         [Required]
         [StringLength(500, MinimumLength = 10, ErrorMessage = "The Author Name must be between 10 and 500 characters.")]
         public string? AuthorDescription { get; set; }
-
-        [Required]
-        [NotMapped]
-        public IFormFile? AuthorImage { get; set; }
 
         [Required]
         [Url]
@@ -53,5 +47,6 @@ namespace HMS.DTOs.Admin
         [Required]
         [Url]
         public string? LinkedIn { get; set; }
+        public DateTime PublishedTime { get; set; }
     }
 }
