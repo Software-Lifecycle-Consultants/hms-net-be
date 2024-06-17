@@ -1,11 +1,9 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HMS.Models.Admin
+namespace HMS.DTOs.Admin
 {
-    public class AdminContacts
+    public class AdminContactDTO
     {
-        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required]
@@ -17,22 +15,27 @@ namespace HMS.Models.Admin
         public string PageDescription { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(50)]
         [EmailAddress(ErrorMessage = "The Email is not a valid e-mail address.")]
         public string Email { get; set; } = string.Empty;
 
         [StringLength(15)]
         [Phone(ErrorMessage = "The Telephone Number is not a valid phone number.")]
-        public string phoneNumber { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(100)]
         public string AddressLine1 { get; set; } = string.Empty;
 
+        [StringLength(100)]
         public string? AddressLine2 { get; set; }
 
         [Required]
+        [StringLength(100)]
         public string City { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(100)]
         public string StateProvince { get; set; } = string.Empty;
 
         [Required]
@@ -40,6 +43,7 @@ namespace HMS.Models.Admin
         public string ZipCode { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(100)]
         public string Country { get; set; } = string.Empty;
 
     }
