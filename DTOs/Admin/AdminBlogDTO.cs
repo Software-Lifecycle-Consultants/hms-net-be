@@ -23,9 +23,11 @@ namespace HMS.DTOs.Admin
         public string BlogContent { get; set; } = string.Empty;
 
         [Required]
+        [NotMapped]
         public IFormFile? CoverImage { get; set; }
 
         [Required]
+        [NotMapped]
         public IFormFile? AuthorImage { get; set; }
 
         [Required]
