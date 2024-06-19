@@ -16,6 +16,7 @@ namespace HMS.Models
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         //Admin
         public DbSet<AdminRoom> AdminRooms { get; set; }
