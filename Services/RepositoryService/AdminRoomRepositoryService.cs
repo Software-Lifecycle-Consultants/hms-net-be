@@ -31,7 +31,7 @@ namespace HMS.Services.RepositoryService
             try
             {
                 return await DbContext.AdminRooms
-                    .Include(ar => ar.Categories)
+                    .Include(ar => ar.AdminCategoryValues)
                     .Include(ar => ar.ServiceAddons)
                     .Include(ar => ar.AdditionalInfo)
                     .ToListAsync();
@@ -49,7 +49,7 @@ namespace HMS.Services.RepositoryService
             try
             {
                 return await DbContext.AdminRooms
-                    .Include(ar => ar.Categories)
+                    .Include(ar => ar.AdminCategoryValues)
                     .Include(ar => ar.ServiceAddons)
                     .Include(ar => ar.AdditionalInfo)
                     .FirstOrDefaultAsync(ar => ar.Id == id);

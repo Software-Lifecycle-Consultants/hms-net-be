@@ -19,13 +19,15 @@ namespace HMS.DTOs.Admin
         [StringLength(500)]
         public string? Description { get; set; }
 
-        //[NotMapped]
-        //public IFormFile? CoverImage { get; set; }
+        public decimal Price { get; set; } = decimal.MinValue;
 
-        public List<AdminCategoryDTO> Categories { get; set; } = new List<AdminCategoryDTO>();
+        //public List<AdminCategoryDTO> Categories { get; set; } = new List<AdminCategoryDTO>();
+        public List<AdminCategoryValueDTO> AdminCategoryValues { get; set; } = new List<AdminCategoryValueDTO>();
 
         public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
 
         public List<AdminAdditionalInfoDTO>? AdditionalInfo { get; set; }
+
+        public string? CoverImagePath { get; set; }
     }
 }

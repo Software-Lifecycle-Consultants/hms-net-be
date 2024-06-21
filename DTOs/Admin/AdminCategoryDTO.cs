@@ -2,8 +2,9 @@
 {
     public class AdminCategoryDTO
     {
-        public string Title { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
-        public List<string> Values { get; set; } = new List<string>();
+        public string Title { get; set; } = string.Empty;
+        
     }
 }

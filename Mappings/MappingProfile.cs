@@ -24,6 +24,8 @@ namespace HMS.Mappings
             CreateMap<AdminCategoryDTO, AdminCategory>().ReverseMap();
             CreateMap<AdminServiceAddonDTO, AdminServiceAddon>().ReverseMap();
             CreateMap<AdminAdditionalInfoDTO, AdminAdditionalInfo>().ReverseMap();
+            CreateMap<AdminRoomSummaryDTO, AdminRoom>().ReverseMap();
+            CreateMap<AdminCategoryValueDTO, AdminCategoryValue>().ReverseMap();
 
         }
     }

@@ -21,8 +21,7 @@ namespace HMS.Controllers.Admin
     {
         
         public AdminRoomController(ILogger<AdminRoomController> logger, IRepositoryService<AdminRoom> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) { }
-        
-
+                
         // GET: api/AdminRooms
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AdminRoomDTO>>> GetAdminRooms()
@@ -204,6 +203,57 @@ namespace HMS.Controllers.Admin
             }
         }
 
-       
+        // GET: api/AdminRoom/Summary
+        [HttpGet("Summary")]
+        public async Task<ActionResult<IEnumerable<AdminRoomSummaryDTO>>> GetAdminRoomSummary()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all AdminRoom Summeries.");
+
+                var adminRooms = await _repositoryService.GetAllAsync();
+
+                if (adminRooms == null || !adminRooms.Any())
+                {
+                    _logger.LogWarning("No AdminRoom Summeries found.");
+                    return NotFound("No AdminRoom Summeries available.");
+                }
+
+                var AdminRoomSummaryDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomDTO>(adminRoom));
+                return Ok(AdminRoomSummaryDTOs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all AdminRoom Summeries.");
+                return StatusCode(500, "An error occurred while retrieving AdminRoom Summeries.");
+            }
+
+        }
+
+        // GET: api/AdminRooms/5/Summary
+        [HttpGet("{id}/Summary")]
+        public async Task<ActionResult<AdminRoomSummaryDTO>> GetAdminRoomSummary(Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching AdminRoom Summary by ID: {AdminRoomId}", id);
+
+                var adminRoom = await _repositoryService.GetByIdAsync(id);
+
+                if (adminRoom == null)
+                {
+                    _logger.LogWarning("AdminRoom Summary with ID {AdminRoomId} not found", id);
+                    return NotFound("AdminRoom Summary not found.");
+                }
+
+                var AdminRoomSummaryDTO = _mapper.Map<AdminRoomSummaryDTO>(adminRoom);
+                return Ok(AdminRoomSummaryDTO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching AdminRoom Summary by ID: {ContactId}", id);
+                return StatusCode(500, "An error occurred while retrieving AdminRoom Summary.");
+            }
+        }
     }
 }

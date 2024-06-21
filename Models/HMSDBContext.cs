@@ -46,10 +46,8 @@ namespace HMS.Models
             modelBuilder.Entity<IdentityRoleClaim<string>>()
                 .ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
 
-            modelBuilder.Entity<AdminRoom>().Ignore(e => e.CoverImage);//already have the NotMapped annotation
-
-            modelBuilder.Entity<AdminRoom>()
-                .HasMany(ar => ar.Categories)
+           modelBuilder.Entity<AdminRoom>()
+                .HasMany(ar => ar.AdminCategoryValues)
                 .WithOne(ac => ac.AdminRoom)
                 .HasForeignKey(ac => ac.AdminRoomId)
                 .OnDelete(DeleteBehavior.Cascade); // Optional: define cascade delete behavior
@@ -68,5 +66,6 @@ namespace HMS.Models
 
 
         }
+        public DbSet<HMS.Models.Admin.AdminRoomSummary> AdminRoomSummary { get; set; } = default!;
     }
 }

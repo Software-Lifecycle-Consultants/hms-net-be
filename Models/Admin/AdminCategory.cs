@@ -10,14 +10,7 @@ namespace HMS.Models.Admin
         public Guid Id { get; set; }
 
         public string Title { get; set; } = string.Empty;
-
-        public List<string> Values { get; set; } = new List<string>();
-
-        [ForeignKey("AdminRoom")]
-        public Guid? AdminRoomId { get; set; }
-
-        [JsonIgnore] // Prevent circular reference in Swagger documentation
-        public AdminRoom AdminRoom { get; set; } = new AdminRoom();
+      
     }
    
 }
