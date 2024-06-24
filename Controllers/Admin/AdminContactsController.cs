@@ -120,7 +120,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminContacts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminContactDTO>> PostAdminContact([FromForm]AdminContactDTO adminContactDto)
+        public async Task<ActionResult<AdminContactDTO>> PostAdminContact(AdminContactDTO adminContactDto)
         {
             try
             {
@@ -136,7 +136,7 @@ namespace HMS.Controllers.Admin
 
                 await _repositoryService.InsertAsync(adminContact);
 
-                ContactDTO resultDto = _mapper.Map<ContactDTO>(adminContact);
+                AdminContactDTO resultDto = _mapper.Map<AdminContactDTO>(adminContact);
                 _logger.LogInformation("Successfully created a new AdminContact with ID: {AdminContactId}", adminContact.Id);
 
                 return CreatedAtAction("GetAdminContact", new { id = adminContact.Id }, resultDto);
