@@ -21,6 +21,7 @@ namespace HMS.Mappings
 
             //Admin
             CreateMap<AdminRoomDTO,AdminRoom>().ReverseMap();
+            CreateMap<AdminContactDTO,AdminContact>().ReverseMap();
           
         }
     }
