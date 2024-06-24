@@ -64,6 +64,8 @@ internal class Program
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<AdminRoom>, AdminRoomRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<Room>, RoomRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<Photo>, PhotoRepository>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 

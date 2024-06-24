@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HMS.Models;
+using HMS.Services.FileService;
+using HMS.DTOs;
+using AutoMapper;
+using HMS.Services.Repository_Service;
 
 namespace HMS.Controllers
 {
@@ -14,10 +18,18 @@ namespace HMS.Controllers
     public class PhotosController : ControllerBase
     {
         private readonly HMSDBContext _context;
+        private readonly IMapper _mapper;
+        private readonly IFileService _imageFileService;
+        private readonly IRepositoryService<Photo> _photoRepository;
 
-        public PhotosController(HMSDBContext context)
+
+        public PhotosController(HMSDBContext context, IRepositoryService<Photo> repositoryService, IFileService fileService, IMapper mapper)
         {
             _context = context;
+            _photoRepository = repositoryService;
+            _imageFileService = fileService;
+            _mapper = mapper;
+
         }
 
         // GET: api/Photos
@@ -75,13 +87,40 @@ namespace HMS.Controllers
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
+        public async Task<ActionResult<Photo>> PostPhoto(Photo photoDto)
         {
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
+            try
+            {
+                Tuple<int, string> fileSaveResult;
+                string? FilePath = default;
 
-            return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+                if (photoDto.File != null)
+                {
+                    fileSaveResult = _imageFileService.SaveFile(photoDto.File);
+                    if (fileSaveResult.Item1 == 1)
+                    {
+                        FilePath = fileSaveResult.Item2;
+                    }
+                    else
+                    {
+                        return BadRequest(fileSaveResult.Item2); // Return an error message if the file save failed
+                    }
+                }
+
+                Photo photo = _mapper.Map<Photo>(photoDto);
+                photo.FilePath = FilePath;
+
+                await _photoRepository.InsertAsync(photo);
+                return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                //_logger.LogError($"Exception at POST: {ex}");
+                throw;
+            }
         }
+
 
         // DELETE: api/Photos/5
         [HttpDelete("{id}")]
