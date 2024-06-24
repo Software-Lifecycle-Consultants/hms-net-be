@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMS.Services.RepositoryService
 {
-    public class AdminRoomRepositoryService : RepositoryServiceBase<AdminRoom,AdminRoomRepositoryService>, IRepositoryService<AdminRoom>
+    public class AdminRoomRepositoryService : RepositoryServiceBase<AdminRoom, AdminRoomRepositoryService>, IRepositoryService<AdminRoom>
     {
-        public AdminRoomRepositoryService(HMSDBContext context,ILogger<AdminRoomRepositoryService> logger) : base(context, logger)
+        public AdminRoomRepositoryService(HMSDBContext context, ILogger<AdminRoomRepositoryService> logger) : base(context, logger)
         {
         }
 
@@ -30,7 +30,11 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminRooms.ToListAsync();
+                return await DbContext.AdminRooms
+                    .Include(ar => ar.AdminCategoryValues)
+                    .Include(ar => ar.ServiceAddons)
+                    .Include(ar => ar.AdditionalInfo)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -44,7 +48,11 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminRooms.FindAsync(id);
+                return await DbContext.AdminRooms
+                    .Include(ar => ar.AdminCategoryValues)
+                    .Include(ar => ar.ServiceAddons)
+                    .Include(ar => ar.AdditionalInfo)
+                    .FirstOrDefaultAsync(ar => ar.Id == id);
             }
             catch (Exception ex)
             {
@@ -57,7 +65,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-               await DbContext.AdminRooms.AddAsync(dbObject);
+                await DbContext.AdminRooms.AddAsync(dbObject);
                 await SaveAsync();
             }
             catch (Exception)
@@ -81,5 +89,5 @@ namespace HMS.Services.RepositoryService
             }
         }
 
-            }
+    }
 }

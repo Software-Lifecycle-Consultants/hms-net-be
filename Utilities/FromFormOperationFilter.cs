@@ -8,39 +8,32 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 /// especially when dealing with nested objects. To address this, ensure that Swashbuckle is configured to understand FromForm parameters and properly generate the necessary schema.
 /// </summary>
 
+
+using System.Linq;
+
 public class FromFormOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var formParameters = context.MethodInfo.GetParameters()
-            .Where(p => p.GetCustomAttributes(typeof(FromFormAttribute), false).Any());
+        var parameterDescriptions = context.ApiDescription.ParameterDescriptions;
+        var formParameters = parameterDescriptions
+            .Where(p => p.Source.Id == "FormFile" || p.Source.Id == "Form")
+            .ToList();
 
-        foreach (var parameter in formParameters)
+        foreach (var formParameter in formParameters)
         {
-            var schema = context.SchemaGenerator.GenerateSchema(parameter.ParameterType, context.SchemaRepository);
-            AddPropertiesToOperation(operation, schema, string.Empty);
-        }
-    }
-
-    private void AddPropertiesToOperation(OpenApiOperation operation, OpenApiSchema schema, string prefix)
-    {
-        foreach (var property in schema.Properties)
-        {
-            var propertyName = string.IsNullOrEmpty(prefix) ? property.Key : $"{prefix}.{property.Key}";
-            var propertySchema = property.Value;
-
-            operation.Parameters.Add(new OpenApiParameter
+            var schema = context.SchemaGenerator.GenerateSchema(formParameter.Type, context.SchemaRepository);
+            foreach (var property in schema.Properties)
             {
-                Name = propertyName,
-                In = ParameterLocation.Query,
-                Schema = propertySchema,
-                Required = schema.Required.Contains(property.Key)
-            });
-
-            if (propertySchema.Type == "object" && propertySchema.Properties.Count > 0)
-            {
-                AddPropertiesToOperation(operation, propertySchema, propertyName);
+                operation.Parameters.Add(new OpenApiParameter
+                {
+                    Name = property.Key,
+                    In = ParameterLocation.Query,
+                    Schema = property.Value,
+                    Required = property.Value.Nullable == false
+                });
             }
         }
     }
 }
+
