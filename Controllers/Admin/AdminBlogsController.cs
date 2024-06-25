@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HMS.Models;
+﻿using AutoMapper;
+using HMS.DTOs.Admin;
 using HMS.Models.Admin;
 using HMS.Services.Repository_Service;
-using AutoMapper;
-using HMS.DTOs.Admin;
-using HMS.DTOs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HMS.Controllers.Admin
 {
@@ -18,16 +11,11 @@ namespace HMS.Controllers.Admin
     [ApiController]
     public class AdminBlogsController : HMSControllerBase<AdminBlogsController, AdminBlog>
     {
-
-
-        public AdminBlogsController(ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper)
-        {
-
-        }
+        public AdminBlogsController(ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) { }
 
         // GET: api/AdminBlogs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminBlogDTO>>> GetAllBlogs()
+        public async Task<ActionResult<IEnumerable<AdminBlogDTO>>> GetBlogs()
         {
             try
             {
@@ -54,7 +42,7 @@ namespace HMS.Controllers.Admin
 
         // GET: api/AdminBlogs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminBlogDTO>> GetBlogById(Guid id)
+        public async Task<ActionResult<AdminBlogDTO>> GetBlog(Guid id)
         {
             try
             {
@@ -129,7 +117,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminBlogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminBlogDTO>> PostBlog([FromForm] AdminBlogDTO adminBlogDto)
+        public async Task<ActionResult<AdminBlogDTO>> PostBlog( AdminBlogDTO adminBlogDto)
         {
             try
             {
@@ -148,7 +136,7 @@ namespace HMS.Controllers.Admin
                 AdminBlogDTO resultDto = _mapper.Map<AdminBlogDTO>(adminBlog);
                 _logger.LogInformation("Successfully created a new AdminBlog with ID: {BlogId}", adminBlog.Id);
 
-                return CreatedAtAction("GetBlogById", new { id = adminBlog.Id }, resultDto);
+                return CreatedAtAction("GetBlog", new { id = adminBlog.Id }, resultDto);
             }
             catch (DbUpdateConcurrencyException ex)
             {
