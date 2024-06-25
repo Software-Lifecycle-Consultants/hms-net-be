@@ -5,7 +5,7 @@ namespace HMS.DTOs.Admin
 {
     public class AdminBlogDTO
     {
-        public Guid Id { get; set; }
+        //public Guid Id { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "The Title must be between 3 and 100 characters.")]
@@ -22,11 +22,11 @@ namespace HMS.DTOs.Admin
         [MinLength(10, ErrorMessage = "The content must be more 10 than characters.")]
         public string BlogContent { get; set; } = string.Empty;
 
-        [Required]
+        
         [NotMapped]
         public IFormFile? CoverImage { get; set; }
 
-        [Required]
+        
         [NotMapped]
         public IFormFile? AuthorImage { get; set; }
 
