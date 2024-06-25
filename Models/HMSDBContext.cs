@@ -69,6 +69,5 @@ namespace HMS.Models
 
         }
         public DbSet<HMS.Models.Admin.AdminRoomSummary> AdminRoomSummary { get; set; } = default!;
-        public DbSet<HMS.Models.Admin.AdminContact> AdminContact { get; set; } = default!;
     }
 }
