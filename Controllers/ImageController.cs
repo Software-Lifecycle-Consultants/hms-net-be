@@ -15,15 +15,15 @@ namespace HMS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PhotosController : ControllerBase
+    public class ImageController : ControllerBase
     {
         private readonly HMSDBContext _context;
         private readonly IMapper _mapper;
         private readonly IFileService _imageFileService;
-        private readonly IRepositoryService<Photo> _photoRepository;
+        private readonly IRepositoryService<Image> _photoRepository;
 
 
-        public PhotosController(HMSDBContext context, IRepositoryService<Photo> repositoryService, IFileService fileService, IMapper mapper)
+        public ImageController(HMSDBContext context, IRepositoryService<Image> repositoryService, IFileService fileService, IMapper mapper)
         {
             _context = context;
             _photoRepository = repositoryService;
@@ -34,16 +34,16 @@ namespace HMS.Controllers
 
         // GET: api/Photos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
+        public async Task<ActionResult<IEnumerable<Image>>> GetPhotos()
         {
-            return await _context.Photos.ToListAsync();
+            return Ok(await _photoRepository.GetAllAsync());
         }
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Photo>> GetPhoto(Guid id)
+        public async Task<ActionResult<Image>> GetPhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _photoRepository.GetByIdAsync(id);
 
             if (photo == null)
             {
@@ -56,22 +56,22 @@ namespace HMS.Controllers
         // PUT: api/Photos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhoto(Guid id, Photo photo)
+        public async Task<IActionResult> PutPhoto(Guid id, Image photo)
         {
             if (id != photo.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(photo).State = EntityState.Modified;
+            _photoRepository.Update(photo);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _photoRepository.SaveAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PhotoExists(id))
+                if (!await _photoRepository.ItemExistsAsync(id))
                 {
                     return NotFound();
                 }
@@ -87,7 +87,7 @@ namespace HMS.Controllers
         // POST: api/Photos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photoDto)
+        public async Task<ActionResult<Image>> PostPhoto([FromForm]ImageDTO photoDto)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace HMS.Controllers
 
                 if (photoDto.File != null)
                 {
-                    fileSaveResult = _imageFileService.SaveFile(photoDto.File);
+                    fileSaveResult = _imageFileService.SaveFile(photoDto.File, nameof(Image));
                     if (fileSaveResult.Item1 == 1)
                     {
                         FilePath = fileSaveResult.Item2;
@@ -107,7 +107,7 @@ namespace HMS.Controllers
                     }
                 }
 
-                Photo photo = _mapper.Map<Photo>(photoDto);
+                Image photo = _mapper.Map<Image>(photoDto);
                 photo.FilePath = FilePath;
 
                 await _photoRepository.InsertAsync(photo);
@@ -126,21 +126,16 @@ namespace HMS.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _photoRepository.GetByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
-
+            await _photoRepository.DeleteAsync(photo);
             return NoContent();
         }
 
-        private bool PhotoExists(Guid id)
-        {
-            return _context.Photos.Any(e => e.Id == id);
-        }
+
     }
 }

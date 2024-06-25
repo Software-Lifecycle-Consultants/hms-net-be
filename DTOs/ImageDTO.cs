@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HMS.DTOs
     
 {
-    public class PhotoDTO
+    public class ImageDTO
     {
         public string? Name { get; set; }
         public IFormFile? File { get; set; }

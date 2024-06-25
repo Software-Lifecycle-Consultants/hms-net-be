@@ -18,7 +18,7 @@ namespace HMS.Mappings
             CreateMap<RoomDTO, Room>();
 
             CreateMap<RoleDTO, IdentityRole>().ReverseMap();
-            CreateMap<PhotoDTO, Photo>().ReverseMap();
+            CreateMap<ImageDTO, Image>().ReverseMap();
 
             //Admin
             CreateMap<AdminRoomDTO, AdminRoom>().ReverseMap();

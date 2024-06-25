@@ -66,6 +66,40 @@
            
      
         }
+        public Tuple<int, string> SaveFile(IFormFile file, string folderName)
+        {
+            try
+            {
+                var contentPath = _environment.ContentRootPath;
+                var path = Path.Combine(contentPath, "Uploads", folderName);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                var ext = Path.GetExtension(file.FileName);
+                var allowedExtensions = new string[] { ".jpg", ".png", ".jpeg" };
+                if (!allowedExtensions.Contains(ext))
+                {
+                    string message = $"Only {string.Join(",", allowedExtensions)} types are allowed";
+                    return new Tuple<int, string>(0, message);
+                }
+
+                //  string uniqueString = Guid.NewGuid().ToString();
+                var uniqeFileName = Guid.NewGuid().ToString() + ext;
+                var uniqueFileWithPath = Path.Combine(path, uniqeFileName);
+
+                using (var stream = new FileStream(uniqueFileWithPath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                return new Tuple<int, string>(1, uniqeFileName);
+            }
+            catch (Exception ex)
+            {
+
+                return new Tuple<int, string>(0, $"An error has occured while saving image file {ex.Message}");
+            }
+        }
 
 
         public string GenerateUniqueFileName(string directoryPath, string imageName)

@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMS.Services.RepositoryService
 {
-    public class PhotoRepository: RepositoryServiceBase<Photo, PhotoRepository>, IRepositoryService<Photo>
+    public class ImageRepositoryService: RepositoryServiceBase<Image, ImageRepositoryService>, IRepositoryService<Image>
     {
-        public PhotoRepository(HMSDBContext context, ILogger<PhotoRepository> logger) : base(context, logger)
+        public ImageRepositoryService(HMSDBContext context, ILogger<ImageRepositoryService> logger) : base(context, logger)
         {
         }
 
-        public async Task DeleteAsync(Photo dbObject)
+        public async Task DeleteAsync(Image dbObject)
         {
             try
             {
@@ -23,7 +23,7 @@ namespace HMS.Services.RepositoryService
             }
         }
 
-        public async Task<IEnumerable<Photo>> GetAllAsync()
+        public async Task<IEnumerable<Image>> GetAllAsync()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace HMS.Services.RepositoryService
             }
         }
 
-        public async Task<Photo?> GetByIdAsync(Guid id)
+        public async Task<Image?> GetByIdAsync(Guid id)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace HMS.Services.RepositoryService
             }
         }
 
-        public async Task InsertAsync(Photo dbObject)
+        public async Task InsertAsync(Image dbObject)
         {
             try
             {
