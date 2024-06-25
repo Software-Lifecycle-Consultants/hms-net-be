@@ -65,6 +65,7 @@ internal class Program
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<AdminRoom>, AdminRoomRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
+        builder.Services.AddScoped<IRepositoryService<AdminBlog>, AdminBlogRepositoryService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
         var app = builder.Build();
