@@ -117,7 +117,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminBlogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminBlogDTO>> PostBlog( AdminBlogDTO adminBlogDto)
+        public async Task<ActionResult<AdminBlogDTO>> PostBlog([FromForm] AdminBlogDTO adminBlogDto)
         {
             try
             {
