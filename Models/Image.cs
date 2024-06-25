@@ -12,7 +12,7 @@ public class Image
     public string? Name { get; set; }
 
     [NotMapped]
-    public IFormFile? File { get; set; }
-    public string? FilePath { get; set; }
+    public IFormFile File { get; set; } 
+    public string FilePath { get; set; } = String.Empty;
 
 }}

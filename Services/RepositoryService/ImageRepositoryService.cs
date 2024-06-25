@@ -14,7 +14,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                DbContext.Photos.Remove(dbObject);
+                DbContext.Images.Remove(dbObject);
                 await SaveAsync();
             }
             catch (Exception ex)
@@ -27,7 +27,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.Photos.ToListAsync();
+                return await DbContext.Images.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -40,7 +40,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.Photos.FindAsync(id);
+                return await DbContext.Images.FindAsync(id);
             }
             catch (Exception ex)
             {
@@ -53,7 +53,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                await DbContext.Photos.AddAsync(dbObject);
+                await DbContext.Images.AddAsync(dbObject);
                 await SaveAsync();
             }
             catch (Exception ex)
