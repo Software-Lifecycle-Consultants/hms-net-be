@@ -25,6 +25,9 @@ namespace HMS.Models
         public DbSet<AdminServiceAddon> AdminServiceAddons { get; set; }
         public DbSet<AdminContact> AdminContacts { get; set; }
 
+        public DbSet<AdminBlog> AdminBlogs { get; set; }
+
+
 
         //https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli
         //Excluding parts of your model
@@ -68,6 +71,8 @@ namespace HMS.Models
 
 
         }
-        public DbSet<HMS.Models.Admin.AdminRoomSummary> AdminRoomSummary { get; set; } = default!;
+        
+        
+        
     }
 }
