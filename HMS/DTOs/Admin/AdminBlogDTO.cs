@@ -21,13 +21,7 @@ namespace HMS.DTOs.Admin
         [Required]
         [MinLength(10, ErrorMessage = "The content must be more 10 than characters.")]
         public string BlogContent { get; set; } = string.Empty;
-
-        [Required]
-        [NotMapped]
         public IFormFile? CoverImage { get; set; }
-
-        [Required]
-        [NotMapped]
         public IFormFile? AuthorImage { get; set; }
 
         [Required]

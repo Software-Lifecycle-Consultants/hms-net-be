@@ -144,7 +144,7 @@ namespace HMS.Controllers
                 string FilePath = default;
                 if (imageDto.File != null)
                 {
-                    fileSaveResult = _imageFileService.SaveFile(imageDto.File, nameof(Image));
+                    fileSaveResult = _imageFileService.SaveFileFolder(imageDto.File, FolderName.Image);
                     if (fileSaveResult.Item1 == 0)
                     {
                         FilePath = fileSaveResult.Item2;
