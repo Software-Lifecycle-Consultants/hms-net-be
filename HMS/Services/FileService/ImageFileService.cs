@@ -48,13 +48,13 @@ namespace HMS.Services.FileService
 
 
         }
-        public Tuple<int, string> SaveFile(IFormFile file, string folderName)
+        public Tuple<int, string> SaveFileFolder(IFormFile file, FolderName folderName)
         {
 
             try
             {
                 var contentPath = _environment.ContentRootPath;
-                var path = Path.Combine(contentPath, "Uploads", folderName);
+                var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
 
                 return Save(file, path);
 
