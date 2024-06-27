@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using HMS.Services.Enums;
 
 namespace HMS.Services.FileService
 {

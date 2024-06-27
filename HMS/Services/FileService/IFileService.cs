@@ -1,4 +1,6 @@
-﻿namespace HMS.Services.FileService
+﻿using HMS.Services.Enums;
+
+namespace HMS.Services.FileService
 {
     public interface IFileService
     {

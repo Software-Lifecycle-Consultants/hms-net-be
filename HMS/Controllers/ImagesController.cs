@@ -11,6 +11,7 @@ using HMS.DTOs;
 using HMS.Services.Repository_Service;
 using HMS.DTOs.Admin;
 using HMS.Services.FileService;
+using HMS.Services.Enums;
 
 namespace HMS.Controllers
 {
@@ -20,7 +21,7 @@ namespace HMS.Controllers
     {
         private readonly IFileService _imageFileService;
 
-        public ImagesController(ILogger<ImagesController> logger, IRepositoryService<Image> repositoryService, IMapper mapper, IFileService fileService) : base(logger, repositoryService, mapper) 
+        public ImagesController(ILogger<ImagesController> logger, IRepositoryService<Image> repositoryService, IMapper mapper, IFileService fileService) : base(logger, repositoryService, mapper)
         {
             _imageFileService = fileService;
         }
@@ -29,7 +30,7 @@ namespace HMS.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ImageDTO>>> GetImages()
         {
-            try 
+            try
             {
                 _logger.LogInformation("Getting all images");
                 var images = await _repositoryService.GetAllAsync();
@@ -149,7 +150,8 @@ namespace HMS.Controllers
                     {
                         FilePath = fileSaveResult.Item2;
                     }
-                    else {
+                    else
+                    {
                         _logger.LogWarning("Image file unsaved.");
                         return BadRequest(ModelState);
                     }
@@ -186,7 +188,8 @@ namespace HMS.Controllers
                 _logger.LogInformation("Attempting to delete Image with ID: {ImageId}", id);
                 var image = await _repositoryService.GetByIdAsync(id);
 
-                if (image == null) { 
+                if (image == null)
+                {
                     _logger.LogWarning("Image with ID: {ImageId} not found for deletion.", id);
                     return NotFound($"No Image found with ID {id}.");
                 }
