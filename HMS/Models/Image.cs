@@ -1,21 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using System.Text.Json.Serialization;
 namespace HMS.Models
 {
-    public class Image
-    {
-        [Required,Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+public class Image
+{
+    
+    [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
+    public string? Name { get; set; }
 
-        public string FullSizePath { get; set; } = string.Empty;
+    [NotMapped]
+    public IFormFile File { get; set; } 
+    public string FilePath { get; set; } = String.Empty;
 
-        public string? DisplaySizePath { get; set; }
-        public string? ThumbNailPath { get; set; }
-
-        public byte[] ImageData { get; set; } = new byte[0];
-
-        [NotMapped]
-        public IFormFile? ImageFile { get; set; }    
-    }
-}
+}}
