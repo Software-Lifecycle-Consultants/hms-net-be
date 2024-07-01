@@ -9,10 +9,12 @@ public class Image
     
     [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
+
     public string? Name { get; set; }
 
     [NotMapped]
-    public IFormFile File { get; set; } 
+    public required IFormFile File { get; set; }
+        
     public string FilePath { get; set; } = String.Empty;
 
 }}

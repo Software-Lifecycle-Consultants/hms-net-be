@@ -1,39 +1,47 @@
 ﻿using System.IO;
 using HMS.Services.Enums;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace HMS.Services.FileService
 {
     public class ImageFileService : IFileService
     {
         private IWebHostEnvironment _environment;
+        protected readonly ILogger<ImageFileService> _logger;
 
-        public ImageFileService(IWebHostEnvironment environment)
-        {
-            _environment = environment;
+        public enum FileStatus {
+            Fail =0,
+            Success 
+            
         }
 
-        public bool DeleteImage(string fileName)
+        public ImageFileService(IWebHostEnvironment environment,ILogger<ImageFileService> logger)
+        {
+            _environment = environment;
+            _logger = logger;
+        }
+
+        public bool DeleteImage(string filePath)
         {
             try
             {
-                var rootPath = _environment.WebRootPath;
-                var path = Path.Combine(rootPath, "Uploads\\", fileName);
-                if (File.Exists(path))
+                if (File.Exists(filePath))
                 {
-                    File.Delete(path);
+                    File.Delete(filePath);
                     return true;
                 }
                 return false;
             }
             catch (Exception ex)
             {
-                return false;
-                //handle this exception gracefully
+                _logger.LogError(ex.Message, "An error occured while deleting image file");
+                return false;               
 
             }
         }
 
-        public Tuple<int, string> SaveFile(IFormFile file)
+        public Tuple<int, string,string> SaveFile(IFormFile file)
         {
             try
             {
@@ -43,13 +51,13 @@ namespace HMS.Services.FileService
             }
             catch (Exception ex)
             {
-
-                return new Tuple<int, string>(0, $"An error has occured while saving image file {ex.Message}");
+                _logger.LogError(ex.Message, "An error occured while saving image file");
+                return new Tuple<int, string,string>((int)FileStatus.Fail, $"An error has occured while saving image file {ex.Message}",string.Empty);
             }
 
 
         }
-        public Tuple<int, string> SaveFileFolder(IFormFile file, FolderName folderName)
+        public Tuple<int, string, string> SaveFileFolder(IFormFile file, FolderName folderName)
         {
 
             try
@@ -62,8 +70,7 @@ namespace HMS.Services.FileService
             }
             catch (Exception ex)
             {
-
-                return new Tuple<int, string>(0, $"An error has occured while saving image file {ex.Message}");
+                return new Tuple<int, string,string>(0, $"An error has occured while saving image file {ex.Message}",string.Empty);
             }
         }
 
@@ -86,37 +93,37 @@ namespace HMS.Services.FileService
 
             return uniqueFileName;
         }
-        private Tuple<int, string> Save(IFormFile file, string directoryPath)
+        private Tuple<int, string,string> Save(IFormFile file, string path)
         {
             try
             {
-                if (!Directory.Exists(directoryPath))
-                    Directory.CreateDirectory(directoryPath);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
 
                 var ext = Path.GetExtension(file.FileName);
                 var allowedExtensions = new string[] { ".jpg", ".png", ".jpeg" };
-                if (!allowedExtensions.Contains(ext))
+                
+                if (!allowedExtensions.Contains(ext.ToLower()))
                 {
                     string message = $"Only {string.Join(",", allowedExtensions)} types are allowed";
-                    return new Tuple<int, string>(0, message);
+                    return new Tuple<int, string,string>((int)FileStatus.Fail, message,string.Empty);
                 }
 
-                //  string uniqueString = Guid.NewGuid().ToString();
                 var uniqeFileName = Guid.NewGuid().ToString() + ext;
-                var uniqueFileWithPath = Path.Combine(directoryPath, uniqeFileName);
+                var uniqueFileWithPath = Path.Combine(path, uniqeFileName);
 
                 using (var stream = new FileStream(uniqueFileWithPath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
 
-                return new Tuple<int, string>(1, uniqeFileName);
+                return new Tuple<int, string,string>(1, uniqueFileWithPath, uniqeFileName );
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+               _logger.LogError(ex.Message, "An error occured while saving image file");
+                return new Tuple<int, string, string>(0, $"An error has occured while saving image file {ex.Message}", string.Empty);
             }
         }
     }

@@ -6,7 +6,7 @@
     public enum FolderName
     {
         AdminRoom = 0,
-        Image = 1,
+        Images = 1,
         Room = 2,
     }
 }

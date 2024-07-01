@@ -141,14 +141,17 @@ namespace HMS.Controllers
                     return BadRequest(ModelState);
                 }
 
-                Tuple<int, string> fileSaveResult;
-                string FilePath = default;
+                Tuple<int, string,string> fileSaveResult;
+                string? filePath = default;
+                string? fileName = default;
+                
                 if (imageDto.File != null)
                 {
-                    fileSaveResult = _imageFileService.SaveFileFolder(imageDto.File, FolderName.Image);
-                    if (fileSaveResult.Item1 == 0)
+                    fileSaveResult = _imageFileService.SaveFileFolder(imageDto.File, FolderName.Images);
+                    if (fileSaveResult.Item1 == 1)
                     {
-                        FilePath = fileSaveResult.Item2;
+                        filePath = fileSaveResult.Item2;
+                        fileName = fileSaveResult.Item3;
                     }
                     else
                     {
@@ -156,8 +159,9 @@ namespace HMS.Controllers
                         return BadRequest(ModelState);
                     }
                 }
-                Image image = _mapper.Map<Image>(imageDto);
-                image.FilePath = FilePath;
+                Image image = _mapper.Map<Image>(imageDto);                
+                image.FilePath = filePath ?? string.Empty; // Ensure filePath is not null
+                image.Name = fileName;
 
                 await _repositoryService.InsertAsync(image);
                 return CreatedAtAction("GetImage", new { id = image.Id }, image);
@@ -194,6 +198,10 @@ namespace HMS.Controllers
                     return NotFound($"No Image found with ID {id}.");
                 }
                 await _repositoryService.DeleteAsync(image);
+
+                //delete from physical locatin
+                _imageFileService.DeleteImage(image.FilePath);
+
                 _logger.LogInformation("Image with ID: {ImageId} deleted successfully.", id);
                 return NoContent();
             }
