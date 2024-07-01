@@ -126,7 +126,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminRooms
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminRoomDTO>> PostAdminRoom([FromForm]AdminRoomDTO adminRoomDto)
+        public async Task<ActionResult<AdminRoomDTO>> PostAdminRoom(AdminRoomDTO adminRoomDto)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace HMS.Controllers.Admin
 
                 await _repositoryService.InsertAsync(adminRoom);
 
-                ContactDTO resultDto = _mapper.Map<ContactDTO>(adminRoom);
+                AdminRoomDTO resultDto = _mapper.Map<AdminRoomDTO>(adminRoom);
                 _logger.LogInformation("Successfully created a new AdminRoom with ID: {AdminRoomId}", adminRoom.Id);
 
                 return CreatedAtAction("GetAdminRoom", new { id = adminRoom.Id }, resultDto);
