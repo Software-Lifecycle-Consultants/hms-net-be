@@ -36,7 +36,7 @@ namespace HMS.Controllers.Admin
                 }
                 var adminContactDTOs = adminContacts.Select(adminContact => _mapper.Map<AdminContactDTO>(adminContact));
                 return Ok(adminContactDTOs);
-                            }
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching all AdminContacts.");

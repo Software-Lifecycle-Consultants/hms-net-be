@@ -48,28 +48,139 @@ namespace HMS.Migrations
                     b.ToTable("AdminAdditionalInfo");
                 });
 
+            modelBuilder.Entity("HMS.Models.Admin.AdminBlog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("AuthorDescription")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BlogContent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Facebook")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LinkedIn")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("PublishedTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Twitter")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminBlogs");
+                });
+
             modelBuilder.Entity("HMS.Models.Admin.AdminCategory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("AdminRoomId")
-                        .HasColumnType("char(36)");
-
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Values")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
+                    b.ToTable("AdminCategories");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminCategoryValue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("AdminCategoryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("AdminRoomId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminCategoryId");
+
                     b.HasIndex("AdminRoomId");
 
-                    b.ToTable("AdminCategories");
+                    b.ToTable("AdminCategoryValue");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminContact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("AddressLine1")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("AddressLine2")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PageDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PageTitle")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("StateProvince")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ZipCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminContacts");
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminRoom", b =>
@@ -78,11 +189,17 @@ namespace HMS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("CoverImagePath")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
                     b.Property<string>("DescriptionTitle")
                         .HasColumnType("longtext");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Subtitle")
                         .HasColumnType("longtext");
@@ -125,11 +242,9 @@ namespace HMS.Migrations
 
             modelBuilder.Entity("HMS.Models.Contact", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
@@ -147,24 +262,15 @@ namespace HMS.Migrations
 
             modelBuilder.Entity("HMS.Models.Image", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("char(36)");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("DisplaySizePath")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("FullSizePath")
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("ImageData")
-                        .IsRequired()
-                        .HasColumnType("longblob");
-
-                    b.Property<string>("ThumbNailPath")
+                    b.Property<string>("Name")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -174,11 +280,9 @@ namespace HMS.Migrations
 
             modelBuilder.Entity("HMS.Models.Room", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<decimal>("BaseRate")
                         .HasColumnType("decimal(65,30)");
@@ -435,12 +539,18 @@ namespace HMS.Migrations
                     b.Navigation("AdminRoom");
                 });
 
-            modelBuilder.Entity("HMS.Models.Admin.AdminCategory", b =>
+            modelBuilder.Entity("HMS.Models.Admin.AdminCategoryValue", b =>
                 {
+                    b.HasOne("HMS.Models.Admin.AdminCategory", "AdminCategory")
+                        .WithMany()
+                        .HasForeignKey("AdminCategoryId");
+
                     b.HasOne("HMS.Models.Admin.AdminRoom", "AdminRoom")
-                        .WithMany("Categories")
+                        .WithMany("AdminCategoryValues")
                         .HasForeignKey("AdminRoomId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("AdminCategory");
 
                     b.Navigation("AdminRoom");
                 });
@@ -510,7 +620,7 @@ namespace HMS.Migrations
                 {
                     b.Navigation("AdditionalInfo");
 
-                    b.Navigation("Categories");
+                    b.Navigation("AdminCategoryValues");
 
                     b.Navigation("ServiceAddons");
                 });

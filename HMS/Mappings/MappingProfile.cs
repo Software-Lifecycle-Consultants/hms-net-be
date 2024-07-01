@@ -17,7 +17,11 @@ namespace HMS.Mappings
             CreateMap<Room, RoomDTO>();
             CreateMap<RoomDTO, Room>();
 
+            CreateMap<AdminBlog, AdminBlogDTO>();
+            CreateMap<AdminBlogDTO, AdminBlog>();
+
             CreateMap<RoleDTO, IdentityRole>().ReverseMap();
+            CreateMap<ImageDTO, Image>().ReverseMap();
 
             //Admin
             CreateMap<AdminRoomDTO, AdminRoom>().ReverseMap();
@@ -26,6 +30,7 @@ namespace HMS.Mappings
             CreateMap<AdminAdditionalInfoDTO, AdminAdditionalInfo>().ReverseMap();
             CreateMap<AdminRoomSummaryDTO, AdminRoom>().ReverseMap();
             CreateMap<AdminCategoryValueDTO, AdminCategoryValue>().ReverseMap();
+            CreateMap<AdminContactDTO,AdminContact>().ReverseMap();
 
         }
     }

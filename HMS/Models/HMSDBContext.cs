@@ -15,6 +15,7 @@ namespace HMS.Models
         }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Room> Rooms { get; set; }
+
         public DbSet<Image> Images { get; set; }
 
         //Admin
@@ -22,6 +23,10 @@ namespace HMS.Models
         public DbSet<AdminCategory> AdminCategories { get; set; }
         public DbSet<AdminAdditionalInfo> AdminAdditionalInfo { get; set; }
         public DbSet<AdminServiceAddon> AdminServiceAddons { get; set; }
+        public DbSet<AdminContact> AdminContacts { get; set; }
+
+        public DbSet<AdminBlog> AdminBlogs { get; set; }
+
 
 
         //https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli
@@ -66,6 +71,8 @@ namespace HMS.Models
 
 
         }
-        public DbSet<HMS.Models.Admin.AdminRoomSummary> AdminRoomSummary { get; set; } = default!;
+        
+        
+        
     }
 }

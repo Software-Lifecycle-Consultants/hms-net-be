@@ -96,7 +96,7 @@ namespace HMS.Controllers
                 }
                 else 
                 {
-                    Tuple<int,string> fileSaveResult;
+                    Tuple<int,string,string> fileSaveResult;
                     string? coverImagePath = default;
                     if (roomDto.ImageFile != null)
                     {
