@@ -5,7 +5,7 @@ namespace HMS.Services.FileService
     public interface IFileService
     {
         public Tuple<int, string,string> SaveFile(IFormFile file);
-        public Tuple<int, string,string> SaveFileFolder(IFormFile file, FolderName folderName);
+        List<Tuple<int, string, string>> SaveFileFolder(IEnumerable<IFormFile> files, FolderName folderName);
         public bool DeleteImage(string filePath);
     }
 }

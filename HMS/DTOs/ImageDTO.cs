@@ -9,8 +9,9 @@ namespace HMS.DTOs
 
         public string? Name { get; set; }
 
-        public required IFormFile File { get; set; }
+        public List<IFormFile> Files { get; set; }
 
         public string? FilePath { get; set; }
+
     }
 }
