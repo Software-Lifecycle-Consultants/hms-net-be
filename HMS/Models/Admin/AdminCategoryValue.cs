@@ -14,7 +14,8 @@ namespace HMS.Models.Admin
         [ForeignKey("AdminCategory")]
         public Guid? AdminCategoryId { get; set; }
 
-        public AdminCategory AdminCategory { get; set; } = new AdminCategory();
+        public AdminCategory? AdminCategory { get; set; } 
+        //since the values in category table is added seperately, i dnt need to create new entry here
 
         [ForeignKey("AdminRoom")]
         public Guid? AdminRoomId { get; set; }

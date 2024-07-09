@@ -10,7 +10,7 @@ namespace HMS.Models.Admin
         public Guid Id { get; set; }
 
         public string Title { get; set; } = string.Empty;
-      
+         
     }
    
 }

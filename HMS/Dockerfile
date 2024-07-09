@@ -9,7 +9,7 @@ COPY *.csproj ./
 COPY . .
 RUN dotnet restore
 # Install Entity Framework Core tools
-RUN dotnet tool install --global dotnet-ef --version 9.0.0-preview.1.24081.2
+#RUN dotnet tool install --global dotnet-ef --version 9.0.0-preview.1.24081.2
 RUN dotnet build -c $BUILD_CONFIGURATION -o /buildOutput
 
 #publish stage
@@ -18,8 +18,8 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish -c $BUILD_CONFIGURATION -o /publishOutput
 
 # Run the database update command as a separate shell script
-COPY update-database.sh /update-database.sh
-RUN chmod +x /update-database.sh
+#COPY update-database.sh /update-database.sh
+#RUN chmod +x /update-database.sh
 
 # Generate runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final

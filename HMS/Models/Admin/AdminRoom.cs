@@ -21,7 +21,6 @@ namespace HMS.Models.Admin
 
         public decimal Price { get; set; } = decimal.MinValue;
 
-        //public List<AdminCategoryValue> AdminCategoryValues { get; set; } = new List<AdminCategoryValue>();
         public List<AdminCategoryValue> AdminCategoryValues { get; set; } = new List<AdminCategoryValue>();
 
         public List<AdminServiceAddon>? ServiceAddons { get; set; }
@@ -29,5 +28,7 @@ namespace HMS.Models.Admin
         public List<AdminAdditionalInfo>? AdditionalInfo { get; set; }
 
         public string? CoverImagePath { get; set; }
+
+
     }
 }

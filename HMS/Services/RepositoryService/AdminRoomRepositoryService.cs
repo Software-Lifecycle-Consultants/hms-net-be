@@ -2,10 +2,11 @@
 using HMS.Models.Admin;
 using HMS.Services.Repository_Service;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HMS.Services.RepositoryService
 {
-    public class AdminRoomRepositoryService : RepositoryServiceBase<AdminRoom, AdminRoomRepositoryService>, IRepositoryService<AdminRoom>
+    public class AdminRoomRepositoryService : RepositoryServiceBase<AdminRoom, AdminRoomRepositoryService>, IAdminRepositoryService
     {
         public AdminRoomRepositoryService(HMSDBContext context, ILogger<AdminRoomRepositoryService> logger) : base(context, logger)
         {
@@ -32,6 +33,7 @@ namespace HMS.Services.RepositoryService
             {
                 return await DbContext.AdminRooms
                     .Include(ar => ar.AdminCategoryValues)
+                        .ThenInclude(acv => acv.AdminCategory) // Include AdminCategory inside AdminCategoryValues
                     .Include(ar => ar.ServiceAddons)
                     .Include(ar => ar.AdditionalInfo)
                     .ToListAsync();
@@ -48,11 +50,14 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminRooms
+                var result =
+                await DbContext.AdminRooms
                     .Include(ar => ar.AdminCategoryValues)
+                        .ThenInclude(acv => acv.AdminCategory) // Include AdminCategory inside AdminCategoryValues
                     .Include(ar => ar.ServiceAddons)
                     .Include(ar => ar.AdditionalInfo)
                     .FirstOrDefaultAsync(ar => ar.Id == id);
+                return result;
             }
             catch (Exception ex)
             {
@@ -89,5 +94,11 @@ namespace HMS.Services.RepositoryService
             }
         }
 
+        public AdminCategory MapAdminCategory(string key, string? value)
+        {
+            var category = DbContext.AdminCategories.FirstOrDefaultAsync(k => k.Title == key);         
+
+            return category.Result != null ? category.Result : new AdminCategory();
+        }
     }
 }

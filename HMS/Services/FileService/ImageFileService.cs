@@ -36,7 +36,7 @@ namespace HMS.Services.FileService
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "An error occured while deleting image file");
-                return false;               
+                return false;
 
             }
         }

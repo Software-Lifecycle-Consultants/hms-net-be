@@ -63,7 +63,7 @@ internal class Program
             .AddEntityFrameworkStores<HMSDBContext>();
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
-        builder.Services.AddScoped<IRepositoryService<AdminRoom>, AdminRoomRepositoryService>();
+        builder.Services.AddScoped<IAdminRepositoryService, AdminRoomRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<Room>, RoomRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<Image>, ImageRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
@@ -182,6 +182,30 @@ internal class Program
                         await userManager.CreateAsync(user, password);
 
                         await userManager.AddToRoleAsync(user, "Admin");
+                    }
+
+                }
+
+                //add temporary room categories 
+                using (var scope = app.Services.CreateScope()) 
+                {
+                    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
+                    var categories = new[] { new AdminCategory { Title= "Category1" }, new AdminCategory { Title = "Category2" } , new AdminCategory { Title = "Category3" } };
+
+                    if (dbContext == null)
+                    {
+                        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
+                    }
+
+                    foreach (var category in categories)
+                    {
+                        // Check if the category with the same title already exists
+                        var existingCategory = await dbContext.AdminCategories.FirstOrDefaultAsync(a => a.Title == category.Title);
+
+                        if (existingCategory == null)
+                            await dbContext.AdminCategories.AddAsync(category);
+                       
+                        await dbContext.SaveChangesAsync();
                     }
 
                 }
