@@ -126,5 +126,51 @@ namespace HMS.Services.FileService
                 return new Tuple<int, string, string>(0, $"An error has occured while saving image file {ex.Message}", string.Empty);
             }
         }
+
+        public Tuple<int, string, string> UpdateImageInPlace(IFormFile file, string existingFilePath)
+        {
+            try
+            {
+                if (file == null)
+                {
+                    _logger.LogWarning("No file provided for updating.");
+                    return new Tuple<int, string, string>((int)FileStatus.Fail, "No file provided for updating.", string.Empty);
+                }
+
+                var ext = Path.GetExtension(file.FileName);
+                var allowedExtensions = new string[] { ".jpg", ".png", ".jpeg" };
+
+                if (!allowedExtensions.Contains(ext.ToLower()))
+                {
+                    string message = $"Only {string.Join(",", allowedExtensions)} types are allowed";
+                    _logger.LogWarning("Invalid file extension: {FileExtension}", ext);
+                    return new Tuple<int, string, string>((int)FileStatus.Fail, message, string.Empty);
+                }
+
+                if (File.Exists(existingFilePath))
+                {
+                    using (var stream = new FileStream(existingFilePath, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+
+                    _logger.LogInformation("Image file updated successfully at path: {ExistingFilePath}", existingFilePath);
+                    return new Tuple<int, string, string>((int)FileStatus.Success, existingFilePath, Path.GetFileName(existingFilePath));
+                }
+                else
+                {
+                    _logger.LogWarning("Existing file path does not exist: {ExistingFilePath}", existingFilePath);
+                    return new Tuple<int, string, string>((int)FileStatus.Fail, $"Existing file path does not exist: {existingFilePath}", string.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating image file at path: {ExistingFilePath}", existingFilePath);
+                return new Tuple<int, string, string>((int)FileStatus.Fail, $"An error has occurred while updating image file {ex.Message}", string.Empty);
+            }
+        }
+
+
+
     }
 }

@@ -22,6 +22,8 @@ namespace HMS.Models.Admin
         public string? Facebook { get; set; }
         public string? Twitter { get; set; }
         public string? LinkedIn { get; set; }
-        public DateTime PublishedTime { get; set; } 
+        public DateTime PublishedTime { get; set; }
+        public string CoverImagePath { get; internal set; } = string.Empty;
+        public string AuthorImagePath { get; internal set; } = string.Empty;
     }
 }
