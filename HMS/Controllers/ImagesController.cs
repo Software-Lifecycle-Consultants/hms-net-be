@@ -129,7 +129,7 @@ namespace HMS.Controllers
         // POST: api/Images
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<Image>>> PostImages( ImageDTO imageDto)
+        public async Task<ActionResult<IEnumerable<ImageReturnDTO>>> PostImages(ImageDTO imageDto)
         {
             try
             {
@@ -141,35 +141,56 @@ namespace HMS.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var fileSaveResults = _imageFileService.SaveFileFolder(imageDto.Files, FolderName.Images);
-                var images = new List<Image>();
-
-                foreach (var fileSaveResult in fileSaveResults)
+                List<ImageReturnDTO> returnList = new List<ImageReturnDTO>();
+                if (imageDto.Files?.Count > 0)
                 {
-                    if (fileSaveResult.Item1 != 1)
+                    foreach (var file in imageDto.Files)
                     {
-                        _logger.LogWarning($"Image file {fileSaveResult.Item3} could not be saved: {fileSaveResult.Item2}");
-                        continue; // Skip files that failed to save
+                        Tuple<int, string, string> fileSaveResult = _imageFileService.SaveFileFolder(file, FolderName.Images);
+
+                        if (fileSaveResult.Item1 != 1)
+                        {
+                            _logger.LogWarning($"Image file {fileSaveResult.Item3} could not be saved: {fileSaveResult.Item2}");
+                            returnList.Add(new ImageReturnDTO
+                            {
+                                FilePath = fileSaveResult.Item2,
+                                Success = false,
+                                ErrorMessage = $"Image file {fileSaveResult.Item3} could not be saved: {fileSaveResult.Item2}"
+                            });
+                            continue; // Skip to the next file if current one failed
+                        }
+
+                        Image image = _mapper.Map<Image>(imageDto);
+                        image.FilePath = fileSaveResult.Item2;
+                        image.Name = fileSaveResult.Item3;
+
+                        try
+                        {
+                            await _repositoryService.InsertAsync(image);
+
+                            // Generate ImageReturnDTO with ImageID
+                            ImageReturnDTO returnObject = _mapper.Map<ImageReturnDTO>(image);
+                            returnObject.Success = true;
+                            returnList.Add(returnObject);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Failed to save image details for file {fileSaveResult.Item3}");
+                            returnList.Add(new ImageReturnDTO
+                            {
+                                FilePath = fileSaveResult.Item2,
+                                Success = false,
+                                ErrorMessage = $"Failed to save image details: {ex.Message}"
+                            });
+                        }
                     }
-
-                    var image = _mapper.Map<Image>(imageDto);
-                    image.FilePath = fileSaveResult.Item2;
-                    image.Name = fileSaveResult.Item3;
-
-                    images.Add(image);
                 }
-
-                if (images.Count == 0)
+                if (returnList.Count == 0)
                 {
                     return BadRequest("No images were uploaded successfully.");
                 }
 
-                foreach (var image in images)
-                {
-                    await _repositoryService.InsertAsync(image);
-                }
-
-                return CreatedAtAction("GetImages", images);
+                return Ok(returnList);
             }
             catch (DbUpdateConcurrencyException ex)
             {

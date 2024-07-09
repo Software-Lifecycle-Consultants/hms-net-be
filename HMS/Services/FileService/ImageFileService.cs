@@ -57,27 +57,27 @@ namespace HMS.Services.FileService
 
 
         }
-        public List<Tuple<int, string, string>> SaveFileFolder(IEnumerable<IFormFile> files, FolderName folderName)
-        {
-            var results = new List<Tuple<int, string, string>>();
-            try
-            {
-                var contentPath = _environment.ContentRootPath;
-                var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
+        //public List<Tuple<int, string, string>> SaveFileToFolder(IEnumerable<IFormFile> files, FolderName folderName)
+        //{
+        //    var results = new List<Tuple<int, string, string>>();
+        //    try
+        //    {
+        //        var contentPath = _environment.ContentRootPath;
+        //        var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
 
-                foreach (var file in files)
-                {
-                    var result = Save(file, path);
-                    results.Add(result);
-                }
-            }
-            catch (Exception ex)
-            {
-                results.Add(new Tuple<int, string, string>(0, $"An error occurred while saving image file: {ex.Message}", string.Empty));
-            }
+        //        foreach (var file in files)
+        //        {
+        //            var result = Save(file, path);
+        //            results.Add(result);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        results.Add(new Tuple<int, string, string>(0, $"An error occurred while saving image file: {ex.Message}", string.Empty));
+        //    }
 
-            return results;
-        }
+        //    return results;
+        //}
 
 
 
@@ -132,5 +132,20 @@ namespace HMS.Services.FileService
             }
         }
 
+        public Tuple<int, string, string> SaveFileFolder(IFormFile file, FolderName folderName)
+        {
+            try
+            {
+                var contentPath = _environment.ContentRootPath;
+                var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
+
+                return Save(file, path);
+
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<int, string, string>(0, $"An error has occured while saving image file {ex.Message}", string.Empty);
+            }
+        }
     }
 }
