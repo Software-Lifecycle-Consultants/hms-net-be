@@ -22,7 +22,7 @@ namespace HMS.Controllers.Admin
 
         // GET: api/AdminBlogs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminBlogDTO>>> GetBlogs()
+        public async Task<ActionResult<IEnumerable<AdminBlogReturnDTO>>> GetBlogs()
         {
             try
             {
@@ -36,8 +36,8 @@ namespace HMS.Controllers.Admin
                     return NotFound("No Blogs available.");
                 }
 
-                var adminBlogDTOs = blogs.Select(blog => _mapper.Map<AdminBlogDTO>(blog));
-                return Ok(adminBlogDTOs);
+                var adminBlogReturnDTOs = blogs.Select(blog => _mapper.Map<AdminBlogReturnDTO>(blog));
+                return Ok(adminBlogReturnDTOs);
             }
             catch (Exception ex)
             {
@@ -49,7 +49,7 @@ namespace HMS.Controllers.Admin
 
         // GET: api/AdminBlogs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminBlogDTO>> GetBlog(Guid id)
+        public async Task<ActionResult<AdminBlogReturnDTO>> GetBlog(Guid id)
         {
             try
             {
@@ -63,8 +63,8 @@ namespace HMS.Controllers.Admin
                     return NotFound("Blog not found.");
                 }
 
-                var adminBlogDTO = _mapper.Map<AdminBlogDTO>(blog);
-                return Ok(adminBlogDTO);
+                var adminBlogReturnDTO = _mapper.Map<AdminBlogReturnDTO>(blog);
+                return Ok(adminBlogReturnDTO);
             }
             catch (Exception ex)
             {
@@ -147,7 +147,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminBlogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminBlogDTO>> PostBlog(AdminBlogDTO adminBlogDto)
+        public async Task<ActionResult<AdminBlogReturnDTO>> PostBlog(AdminBlogDTO adminBlogDto)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace HMS.Controllers.Admin
                 adminBlog.AuthorImagePath = authorImageFilePath ?? string.Empty;
                 await _repositoryService.InsertAsync(adminBlog);
 
-                AdminBlogDTO resultDto = _mapper.Map<AdminBlogDTO>(adminBlog);
+                AdminBlogReturnDTO resultDto = _mapper.Map<AdminBlogReturnDTO>(adminBlog);
                 _logger.LogInformation("Successfully created a new AdminBlog with ID: {BlogId}", adminBlog.Id);
 
                 return CreatedAtAction("GetBlog", new { id = adminBlog.Id }, resultDto);
