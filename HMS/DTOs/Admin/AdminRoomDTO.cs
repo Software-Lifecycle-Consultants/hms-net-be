@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using HMS.Models.Admin;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using HMS.Utilities;
 
 namespace HMS.DTOs.Admin
 {
@@ -23,7 +24,8 @@ namespace HMS.DTOs.Admin
 
         public decimal Price { get; set; } = decimal.MinValue;
 
-        public Dictionary<string, string> CategoryValuesDictionary { get; set; } = new Dictionary<string, string>();
+        [JsonConverter(typeof(DictionaryStringIntJsonConverter))]
+        public Dictionary<int, int> CategoryValuesDictionary { get; set; } = new Dictionary<int, int>();
 
         [JsonIgnore]
        // [BindNever]
@@ -31,9 +33,12 @@ namespace HMS.DTOs.Admin
 
         public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
 
-        public List<AdminAdditionalInfoDTO>? AdditionalInfo { get; set; }
+        public string? AditionalInfoTitle { get; set; }
 
-       // public IFormFile? CoverImage { get; set; }
+        public string? AditionalInfoDescription { get; set; }
+
+
+        // public IFormFile? CoverImage { get; set; }
 
 
 
@@ -53,11 +58,13 @@ namespace HMS.DTOs.Admin
 
         public decimal Price { get; set; } = decimal.MinValue;
 
-        public List<AdminCategoryReturnValueDTO>? AdminCategoryValues { get; set; } 
+        public List<CategoryValueDTO>? AdminCategoryValues { get; set; } 
 
         public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
 
-        public List<AdminAdditionalInfoDTO>? AdditionalInfo { get; set; }
+        public string? AditionalInfoTitle { get; set; }
+
+        public string? AditionalInfoDescription { get; set; }
 
         public string? CoverImagePath { get; set; }
     }

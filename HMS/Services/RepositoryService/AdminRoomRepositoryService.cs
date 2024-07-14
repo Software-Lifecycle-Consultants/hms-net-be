@@ -32,10 +32,10 @@ namespace HMS.Services.RepositoryService
             try
             {
                 return await DbContext.AdminRooms
-                    .Include(ar => ar.AdminCategoryValues)
-                        .ThenInclude(acv => acv.AdminCategory) // Include AdminCategory inside AdminCategoryValues
-                    .Include(ar => ar.ServiceAddons)
-                    .Include(ar => ar.AdditionalInfo)
+                    .Include(ar => ar.CategoryValues)
+                        .ThenInclude(cv => cv.AdminCategoryValues) // Include AdminCategory inside CategoryValues
+                          .ThenInclude(acv=> acv.AdminCategory)
+                    .Include(ar => ar.ServiceAddons)                    
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -52,10 +52,10 @@ namespace HMS.Services.RepositoryService
             {
                 var result =
                 await DbContext.AdminRooms
-                    .Include(ar => ar.AdminCategoryValues)
-                        .ThenInclude(acv => acv.AdminCategory) // Include AdminCategory inside AdminCategoryValues
+                    .Include(ar => ar.CategoryValues)
+                        .ThenInclude(cv => cv.AdminCategoryValues) // Include AdminCategory inside CategoryValues
+                          .ThenInclude(acv => acv.AdminCategory)
                     .Include(ar => ar.ServiceAddons)
-                    .Include(ar => ar.AdditionalInfo)
                     .FirstOrDefaultAsync(ar => ar.Id == id);
                 return result;
             }
@@ -99,6 +99,47 @@ namespace HMS.Services.RepositoryService
             var category = DbContext.AdminCategories.FirstOrDefaultAsync(k => k.Title == key);         
 
             return category.Result != null ? category.Result : new AdminCategory();
+        }
+
+        public async Task<Tuple<int, int>> MapAdminCategory(Guid key)
+        {
+            try
+            {
+                var result = await DbContext.CategoryValues
+                .Include(cv => cv.AdminCategoryValues)
+                  .ThenInclude(acv => acv.AdminCategory)
+                .FirstOrDefaultAsync(cv => cv.Id == key);
+
+                Tuple<int, int> categoryValueResult = new Tuple<int, int>(result!.AdminCategoryValuesId, result!.AdminCategoryValues.AdminCategoryId);
+                return categoryValueResult;
+            }
+            catch (Exception ex)
+            {
+                RepoLogger.LogError("Exception at MapAdminCategory: {0}", ex.Message);
+                throw;
+            }
+            
+             
+        }
+
+        public Dictionary<string, string> GetCategoryKeyValuePairs(int categoryId, int categoryValueId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> CategoryValueExists(int categoryValueId)
+        {
+            try
+            {
+                return await DbContext.AdminCategoryValues.AnyAsync(e => e.Id == categoryValueId);
+            }
+            catch (Exception ex)
+            {
+
+                RepoLogger.LogError("Exception at CategoryValueExists: {0}", ex.Message);
+                throw;
+            }
+        
         }
     }
 }

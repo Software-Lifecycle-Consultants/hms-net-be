@@ -21,13 +21,21 @@ namespace HMS.Models.Admin
 
         public decimal Price { get; set; } = decimal.MinValue;
 
-        public List<AdminCategoryValue> AdminCategoryValues { get; set; } = new List<AdminCategoryValue>();
+        public List<CategoryValue> CategoryValues { get; set; } = new List<CategoryValue>();
 
         public List<AdminServiceAddon>? ServiceAddons { get; set; }
 
-        public List<AdminAdditionalInfo>? AdditionalInfo { get; set; }
+        public string? AditionalInfoTitle { get; set; }
 
-        public string? CoverImagePath { get; set; }
+        public string? AditionalInfoDescription{ get; set; }
+
+        //public List<AdminAdditionalInfo>? AdditionalInfo { get; set; }
+
+        //public string? CoverImagePath { get; set; }
+
+        public Guid? CoverImageId { get; set;}
+
+        //public Image Image { get; set; }
 
 
     }

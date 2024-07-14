@@ -24,10 +24,10 @@ namespace HMS.Mappings
             CreateMap<AdminRoomDTO, AdminRoom>().ReverseMap();
             CreateMap<AdminRoomReturnDTO, AdminRoom>().ReverseMap();            
             CreateMap<AdminCategoryDTO, AdminCategory>().ReverseMap();
-            CreateMap<AdminCategoryValueDTO, AdminCategoryValue>().ReverseMap();
-            CreateMap<AdminCategoryReturnValueDTO, AdminCategoryValue>().ReverseMap();            
+            CreateMap<AdminCategoryValueDTO, CategoryValue>().ReverseMap();
+            CreateMap<AdminCategoryReturnValueDTO, CategoryValue>().ReverseMap();            
             CreateMap<AdminServiceAddonDTO, AdminServiceAddon>().ReverseMap();
-            CreateMap<AdminAdditionalInfoDTO, AdminAdditionalInfo>().ReverseMap();
+            //CreateMap<AdminAdditionalInfoDTO, AdminAdditionalInfo>().ReverseMap();
             CreateMap<AdminRoomSummaryDTO, AdminRoom>().ReverseMap();            
             CreateMap<AdminContactDTO,AdminContact>().ReverseMap();
 

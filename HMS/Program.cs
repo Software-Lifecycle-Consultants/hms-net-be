@@ -1,6 +1,7 @@
 using HMS.Models;
 using HMS.Models.Admin;
 using HMS.Services.FileService;
+using HMS.Services.MappingService;
 using HMS.Services.Repository_Service;
 using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Identity;
@@ -67,6 +68,8 @@ internal class Program
         builder.Services.AddScoped<IRepositoryService<Room>, RoomRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<Image>, ImageRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
+
+        builder.Services.AddScoped<AdminRoomMappingService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
         var app = builder.Build();
@@ -186,7 +189,7 @@ internal class Program
 
                 }
 
-                //add temporary room categories 
+                //add temporary room categoryValues 
                 using (var scope = app.Services.CreateScope()) 
                 {
                     var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
@@ -199,12 +202,44 @@ internal class Program
 
                     foreach (var category in categories)
                     {
-                        // Check if the category with the same title already exists
+                        // Check if the value with the same title already exists
                         var existingCategory = await dbContext.AdminCategories.FirstOrDefaultAsync(a => a.Title == category.Title);
 
                         if (existingCategory == null)
                             await dbContext.AdminCategories.AddAsync(category);
                        
+                        await dbContext.SaveChangesAsync();
+                    }
+
+                }
+
+                //add temporary room value values 
+                using (var scope = app.Services.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
+                    var categoryValues = new[] { new AdminCategoryValue { Value="Category1Value1", AdminCategoryId=1},
+                                             new AdminCategoryValue { Value="Category1Value2", AdminCategoryId=1 },
+                                             new AdminCategoryValue { Value="Category1Value3", AdminCategoryId=1 },
+                                             new AdminCategoryValue { Value="Category2Value1", AdminCategoryId=2},
+                                             new AdminCategoryValue { Value="Category2Value2", AdminCategoryId=2 },
+                                             new AdminCategoryValue { Value="Category2Value3", AdminCategoryId=2 },
+                                             new AdminCategoryValue { Value="Category3Value1", AdminCategoryId=3},
+                                             new AdminCategoryValue { Value="Category3Value2", AdminCategoryId=3 },
+                                             new AdminCategoryValue { Value="Category3Value3", AdminCategoryId=3 },};
+
+                    if (dbContext == null)
+                    {
+                        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
+                    }
+
+                    foreach (var value in categoryValues)
+                    {
+                        // Check if the value with the same title already exists
+                        var existingCategory = await dbContext.AdminCategoryValues.FirstOrDefaultAsync(v => v.Value == value.Value && v.AdminCategoryId==value.AdminCategoryId);
+
+                        if (existingCategory == null)
+                            await dbContext.AdminCategoryValues.AddAsync(value);
+
                         await dbContext.SaveChangesAsync();
                     }
 

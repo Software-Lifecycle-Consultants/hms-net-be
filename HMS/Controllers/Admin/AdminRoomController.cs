@@ -14,6 +14,7 @@ using AutoMapper;
 using HMS.DTOs;
 using HMS.Services.FileService;
 using HMS.Services.Enums;
+using HMS.Services.MappingService;
 
 namespace HMS.Controllers.Admin
 {
@@ -22,10 +23,12 @@ namespace HMS.Controllers.Admin
     public class AdminRoomController : HMSControllerBase<AdminRoomController,AdminRoom>
     {
         private readonly IFileService _imageFileService;
+        private readonly AdminRoomMappingService _mappingService; //see if you can take this to baseclass with an interface
 
-        public AdminRoomController(IFileService imageFileService,ILogger<AdminRoomController> logger, IAdminRepositoryService repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) 
+        public AdminRoomController(AdminRoomMappingService mappingService,IFileService imageFileService,ILogger<AdminRoomController> logger, IAdminRepositoryService repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) 
         {
             _imageFileService = imageFileService;
+            _mappingService = mappingService;
         }
                 
         // GET: api/AdminRooms
@@ -34,17 +37,13 @@ namespace HMS.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Fetching all AdminRooms.");
+                var adminRoomReturnDTOs = await _mappingService.GetAdminRooms();
 
-                var adminRooms = await _adminRepository.GetAllAsync();
-
-                if (adminRooms == null || !adminRooms.Any())
+                if (!adminRoomReturnDTOs.Any())
                 {
-                    _logger.LogWarning("No AdminRooms found.");
                     return NotFound("No AdminRooms available.");
                 }
 
-                var adminRoomReturnDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomReturnDTO>(adminRoom));
                 return Ok(adminRoomReturnDTOs);
             }
             catch (Exception ex)
@@ -143,12 +142,21 @@ namespace HMS.Controllers.Admin
                     _logger.LogWarning("Invalid model state for creating a new AdminRoom");
                     return BadRequest(ModelState);
                 }
-                
+                AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
+                List<CategoryValue> categoryValues = new List<CategoryValue>();
+               
                 foreach (var item in adminRoomDto.CategoryValuesDictionary)
                 {
-                    var result = _adminRepository.MapAdminCategory(item.Key,item.Value);
-                    adminRoomDto.AdminCategoryValues.Add(new AdminCategoryValueDTO { Value = item.Value, AdminCategoryId = result.Id,AdminCategory =result });
+                    //before assigning AdminCategoryValuesId, we need to see if that entry exists in the DB, if not it throws an exception with FK mapping
+                    if (await _adminRepository.CategoryValueExists(item.Value))
+                    {
+                        categoryValues.Add(new CategoryValue { AdminCategoryValuesId = item.Value, AdminRoomId = adminRoom.Id }); ;
+                    }
+                   
+                    //var result = _adminRepository.MapAdminCategory(item.Key,item.Value);
+                    //adminRoomDto.AdminCategoryValues.Add(new AdminCategoryValueDTO { Value = item.Value, AdminCategoryId = result.Id,AdminCategory =result });
                 }
+                adminRoom.CategoryValues = categoryValues;
 
                 //Save cover-image
                 //Tuple<int, string, string> fileSaveResult;
@@ -160,14 +168,27 @@ namespace HMS.Controllers.Admin
                 //    if (fileSaveResult.Item1 == 1)
                 //        coverImage = fileSaveResult.Item2;
                 //}
-               
-                AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
+
+                //AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
+                //adminRoom.CategoryValues.Add(new CategoryValue { });
                 //adminRoom.CoverImagePath = coverImage;
 
                 await _adminRepository.InsertAsync(adminRoom);
 
                 AdminRoomReturnDTO resultDto = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
 
+                List<CategoryValueDTO> categoryValueDTOs = new List<CategoryValueDTO>();
+                foreach (var item in adminRoom.CategoryValues)
+                {
+                  var result = await _adminRepository.MapAdminCategory(item.Id);
+                    CategoryValueDTO categoryValueDTO = new CategoryValueDTO();
+                    categoryValueDTO.CatergoryValueID = item.Id;
+                    categoryValueDTO.AdminCategoryId = result!.Item1;
+                    categoryValueDTO.AdminCategoryValue = result!.Item2;
+                    categoryValueDTOs.Add(categoryValueDTO);
+                }
+
+                resultDto.AdminCategoryValues = categoryValueDTOs;
                 _logger.LogInformation("Successfully created a new AdminRoom with ID: {AdminRoomId}", adminRoom.Id);
 
                 return CreatedAtAction("GetAdminRoom", new { id = adminRoom.Id }, resultDto);
