@@ -12,6 +12,9 @@ using HMS.Services.Repository_Service;
 using HMS.Services.RepositoryService;
 using AutoMapper;
 using HMS.DTOs;
+using HMS.Services.FileService;
+using HMS.Services.Enums;
+using HMS.Services.MappingService;
 
 namespace HMS.Controllers.Admin
 {
@@ -19,27 +22,29 @@ namespace HMS.Controllers.Admin
     [ApiController]
     public class AdminRoomController : HMSControllerBase<AdminRoomController,AdminRoom>
     {
-        
-        public AdminRoomController(ILogger<AdminRoomController> logger, IRepositoryService<AdminRoom> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) { }
+        private readonly IFileService _imageFileService;
+        private readonly AdminRoomMappingService _mappingService; //see if you can take this to baseclass with an interface
+
+        public AdminRoomController(AdminRoomMappingService mappingService,IFileService imageFileService,ILogger<AdminRoomController> logger, IAdminRepositoryService repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) 
+        {
+            _imageFileService = imageFileService;
+            _mappingService = mappingService;
+        }
                 
         // GET: api/AdminRooms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminRoomDTO>>> GetAdminRooms()
+        public async Task<ActionResult<IEnumerable<AdminRoomReturnDTO>>> GetAdminRooms()
         {
             try
             {
-                _logger.LogInformation("Fetching all AdminRooms.");
+                var adminRoomReturnDTOs = await _mappingService.GetAdminRooms();
 
-                var adminRooms = await _repositoryService.GetAllAsync();
-
-                if (adminRooms == null || !adminRooms.Any())
+                if (!adminRoomReturnDTOs.Any())
                 {
-                    _logger.LogWarning("No AdminRooms found.");
                     return NotFound("No AdminRooms available.");
                 }
 
-                var adminRoomDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomDTO>(adminRoom));
-                return Ok(adminRoomDTOs);
+                return Ok(adminRoomReturnDTOs);
             }
             catch (Exception ex)
             {
@@ -51,13 +56,13 @@ namespace HMS.Controllers.Admin
 
         // GET: api/AdminRooms/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminRoomDTO>> GetAdminRoom(Guid id)
+        public async Task<ActionResult<AdminRoomReturnDTO>> GetAdminRoom(Guid id)
         {
             try
             {
                 _logger.LogInformation("Fetching AdminRoom by ID: {AdminRoomId}", id);
 
-                var adminRoom = await _repositoryService.GetByIdAsync(id);
+                var adminRoom = await _adminRepository.GetByIdAsync(id);
 
                 if (adminRoom == null)
                 {
@@ -65,8 +70,8 @@ namespace HMS.Controllers.Admin
                     return NotFound("AdminRoom not found.");
                 }
 
-                var adminRoomDTO = _mapper.Map<AdminRoomDTO>(adminRoom);
-                return Ok(adminRoomDTO);
+                var adminRoomReturnDTO = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
+                return Ok(adminRoomReturnDTO);
             }
             catch (Exception ex)
             {
@@ -90,7 +95,7 @@ namespace HMS.Controllers.Admin
                     return BadRequest(ModelState);
                 }
 
-                var existingAdminRoom = await _repositoryService.GetByIdAsync(id);
+                var existingAdminRoom = await _adminRepository.GetByIdAsync(id);
                 if (existingAdminRoom == null)
                 {
                     _logger.LogWarning("AdminRoom with ID: {AdminRoomId} not found for update.", id);
@@ -100,8 +105,8 @@ namespace HMS.Controllers.Admin
                 _mapper.Map(adminRoomDto, existingAdminRoom);
                 existingAdminRoom.Id = id; // Explicitly set the Id just to assert control over it.
 
-                _repositoryService.Update(existingAdminRoom);
-                await _repositoryService.SaveAsync();
+                _adminRepository.Update(existingAdminRoom);
+                await _adminRepository.SaveAsync();
 
                 _logger.LogInformation("AdminRoom with ID: {AdminRoomId} updated successfully.", id);
                 return NoContent();
@@ -126,7 +131,7 @@ namespace HMS.Controllers.Admin
         // POST: api/AdminRooms
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminRoomDTO>> PostAdminRoom([FromForm]AdminRoomDTO adminRoomDto)
+        public async Task<ActionResult<AdminRoomReturnDTO>> PostAdminRoom(AdminRoomDTO adminRoomDto)
         {
             try
             {
@@ -137,12 +142,53 @@ namespace HMS.Controllers.Admin
                     _logger.LogWarning("Invalid model state for creating a new AdminRoom");
                     return BadRequest(ModelState);
                 }
-
                 AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
+                List<CategoryValue> categoryValues = new List<CategoryValue>();
+               
+                foreach (var item in adminRoomDto.CategoryValuesDictionary)
+                {
+                    //before assigning AdminCategoryValuesId, we need to see if that entry exists in the DB, if not it throws an exception with FK mapping
+                    if (await _adminRepository.CategoryValueExists(item.Value))
+                    {
+                        categoryValues.Add(new CategoryValue { AdminCategoryValuesId = item.Value, AdminRoomId = adminRoom.Id }); ;
+                    }
+                   
+                    //var result = _adminRepository.MapAdminCategory(item.Key,item.Value);
+                    //adminRoomDto.AdminCategoryValues.Add(new AdminCategoryValueDTO { Value = item.Value, AdminCategoryId = result.Id,AdminCategory =result });
+                }
+                adminRoom.CategoryValues = categoryValues;
 
-                await _repositoryService.InsertAsync(adminRoom);
+                //Save cover-image
+                //Tuple<int, string, string> fileSaveResult;
+                //string coverImage = string.Empty;
 
-                ContactDTO resultDto = _mapper.Map<ContactDTO>(adminRoom);
+                //if (adminRoomDto.CoverImage != null)
+                //{
+                //    fileSaveResult = _imageFileService.SaveFileFolder(adminRoomDto.CoverImage, FolderName.AdminRoom);
+                //    if (fileSaveResult.Item1 == 1)
+                //        coverImage = fileSaveResult.Item2;
+                //}
+
+                //AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
+                //adminRoom.CategoryValues.Add(new CategoryValue { });
+                //adminRoom.CoverImagePath = coverImage;
+
+                await _adminRepository.InsertAsync(adminRoom);
+
+                AdminRoomReturnDTO resultDto = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
+
+                List<CategoryValueDTO> categoryValueDTOs = new List<CategoryValueDTO>();
+                foreach (var item in adminRoom.CategoryValues)
+                {
+                  var result = await _adminRepository.MapAdminCategory(item.Id);
+                    CategoryValueDTO categoryValueDTO = new CategoryValueDTO();
+                    categoryValueDTO.CatergoryValueID = item.Id;
+                    categoryValueDTO.AdminCategoryId = result!.Item1;
+                    categoryValueDTO.AdminCategoryValue = result!.Item2;
+                    categoryValueDTOs.Add(categoryValueDTO);
+                }
+
+                resultDto.AdminCategoryValues = categoryValueDTOs;
                 _logger.LogInformation("Successfully created a new AdminRoom with ID: {AdminRoomId}", adminRoom.Id);
 
                 return CreatedAtAction("GetAdminRoom", new { id = adminRoom.Id }, resultDto);
@@ -174,14 +220,14 @@ namespace HMS.Controllers.Admin
             {
                 _logger.LogInformation("Attempting to delete AdminRoom with ID: {AdminRoomId}", id);
 
-                var adminRoom = await _repositoryService.GetByIdAsync(id);
+                var adminRoom = await _adminRepository.GetByIdAsync(id);
                 if (adminRoom == null)
                 {
                     _logger.LogWarning("AdminRoom with ID: {AdminRoomId} not found", id);
                     return NotFound();
                 }
 
-                await _repositoryService.DeleteAsync(adminRoom);
+                await _adminRepository.DeleteAsync(adminRoom);
                 _logger.LogInformation("Successfully deleted AdminRoom with ID: {AdminRoomId}", id);
 
                 return NoContent();
@@ -211,7 +257,7 @@ namespace HMS.Controllers.Admin
             {
                 _logger.LogInformation("Fetching all AdminRoom Summeries.");
 
-                var adminRooms = await _repositoryService.GetAllAsync();
+                var adminRooms = await _adminRepository.GetAllAsync();
 
                 if (adminRooms == null || !adminRooms.Any())
                 {
@@ -238,7 +284,7 @@ namespace HMS.Controllers.Admin
             {
                 _logger.LogInformation("Fetching AdminRoom Summary by ID: {AdminRoomId}", id);
 
-                var adminRoom = await _repositoryService.GetByIdAsync(id);
+                var adminRoom = await _adminRepository.GetByIdAsync(id);
 
                 if (adminRoom == null)
                 {
