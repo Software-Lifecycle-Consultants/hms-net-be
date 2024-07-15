@@ -12,7 +12,6 @@ using HMS.Services.Repository_Service;
 using HMS.DTOs.Admin;
 using HMS.Services.FileService;
 using HMS.Services.Enums;
-using static HMS.Services.FileService.ImageFileService;
 
 namespace HMS.Controllers
 {
@@ -130,7 +129,7 @@ namespace HMS.Controllers
         // POST: api/Images
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Image>> PostImage(ImageDTO imageDto)
+        public async Task<ActionResult<Image>> PostImage([FromForm] ImageDTO imageDto)
         {
             try
             {
@@ -149,7 +148,7 @@ namespace HMS.Controllers
                 if (imageDto.File != null)
                 {
                     fileSaveResult = _imageFileService.SaveFileFolder(imageDto.File, FolderName.Images);
-                    if (fileSaveResult.Item1 == (int)FileStatus.Success)
+                    if (fileSaveResult.Item1 == 1)
                     {
                         filePath = fileSaveResult.Item2;
                         fileName = fileSaveResult.Item3;

@@ -25,11 +25,7 @@ namespace HMS.DTOs.Admin
         public decimal Price { get; set; } = decimal.MinValue;
 
         [JsonConverter(typeof(DictionaryStringIntJsonConverter))]
-        public Dictionary<int, int> CategoryValuesDictionary { get; set; } = new Dictionary<int, int>();
-
-        [JsonIgnore]
-       // [BindNever]
-        public List<AdminCategoryValueDTO> AdminCategoryValues { get; set; } = new List<AdminCategoryValueDTO>();
+        public Dictionary<int, int> CategoryValuesDictionary { get; set; } = new Dictionary<int, int>();     
 
         public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
 
@@ -37,10 +33,7 @@ namespace HMS.DTOs.Admin
 
         public string? AditionalInfoDescription { get; set; }
 
-
         // public IFormFile? CoverImage { get; set; }
-
-
 
     }
 

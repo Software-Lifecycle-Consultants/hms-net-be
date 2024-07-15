@@ -4,6 +4,7 @@ using HMS.Services.FileService;
 using HMS.Services.MappingService;
 using HMS.Services.Repository_Service;
 using HMS.Services.RepositoryService;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,15 @@ internal class Program
             options.OperationFilter<SecurityRequirementsOperationFilter>();
             // Register a custom operation filter to handle FromForm parameters (nested objects)
             options.OperationFilter<FromFormOperationFilter>();
+        });
+
+        // Configuration for request body size limit - this is required when uploading large files
+        IConfiguration configuration = builder.Configuration;
+        long requestBodyLimit = configuration.GetValue<long>("RequestBodyLimit", 30000000); // Default to 30 MB if not specified
+
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = requestBodyLimit;
         });
 
         // builder.Services.AddDbContext<HMSDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
