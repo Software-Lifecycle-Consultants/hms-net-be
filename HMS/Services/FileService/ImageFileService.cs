@@ -57,22 +57,28 @@ namespace HMS.Services.FileService
 
 
         }
-        public Tuple<int, string, string> SaveFileFolder(IFormFile file, FolderName folderName)
-        {
+        //public List<Tuple<int, string, string>> SaveFileToFolder(IEnumerable<IFormFile> files, FolderName folderName)
+        //{
+        //    var results = new List<Tuple<int, string, string>>();
+        //    try
+        //    {
+        //        var contentPath = _environment.ContentRootPath;
+        //        var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
 
-            try
-            {
-                var contentPath = _environment.ContentRootPath;
-                var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
+        //        foreach (var file in files)
+        //        {
+        //            var result = Save(file, path);
+        //            results.Add(result);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        results.Add(new Tuple<int, string, string>(0, $"An error occurred while saving image file: {ex.Message}", string.Empty));
+        //    }
 
-                return Save(file, path);
+        //    return results;
+        //}
 
-            }
-            catch (Exception ex)
-            {
-                return new Tuple<int, string,string>(0, $"An error has occured while saving image file {ex.Message}",string.Empty);
-            }
-        }
 
 
         public string GenerateUniqueFileName(string directoryPath, string imageName)
@@ -93,7 +99,7 @@ namespace HMS.Services.FileService
 
             return uniqueFileName;
         }
-        private Tuple<int, string,string> Save(IFormFile file, string path)
+        private Tuple<int, string, string> Save(IFormFile file, string path)
         {
             try
             {
@@ -102,11 +108,11 @@ namespace HMS.Services.FileService
 
                 var ext = Path.GetExtension(file.FileName);
                 var allowedExtensions = new string[] { ".jpg", ".png", ".jpeg" };
-                
+
                 if (!allowedExtensions.Contains(ext.ToLower()))
                 {
                     string message = $"Only {string.Join(",", allowedExtensions)} types are allowed";
-                    return new Tuple<int, string,string>((int)FileStatus.Fail, message,string.Empty);
+                    return new Tuple<int, string, string>((int)FileStatus.Fail, message, string.Empty);
                 }
 
                 var uniqeFileName = Guid.NewGuid().ToString() + ext;
@@ -117,12 +123,27 @@ namespace HMS.Services.FileService
                     file.CopyTo(stream);
                 }
 
-                return new Tuple<int, string,string>(1, uniqueFileWithPath, uniqeFileName );
+                return new Tuple<int, string, string>(1, uniqueFileWithPath, uniqeFileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while saving image file");
+                return new Tuple<int, string, string>(0, $"An error has occurred while saving image file {ex.Message}", string.Empty);
+            }
+        }
+
+        public Tuple<int, string, string> SaveFileFolder(IFormFile file, FolderName folderName)
+        {
+            try
+            {
+                var contentPath = _environment.ContentRootPath;
+                var path = Path.Combine(contentPath, "Uploads", folderName.ToString());
+
+                return Save(file, path);
 
             }
             catch (Exception ex)
             {
-               _logger.LogError(ex.Message, "An error occured while saving image file");
                 return new Tuple<int, string, string>(0, $"An error has occured while saving image file {ex.Message}", string.Empty);
             }
         }

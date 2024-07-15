@@ -129,59 +129,86 @@ namespace HMS.Controllers
         // POST: api/Images
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Image>> PostImage([FromForm] ImageDTO imageDto)
+        public async Task<ActionResult<IEnumerable<ImageReturnDTO>>> PostImages(ImageDTO imageDto)
         {
             try
             {
-                _logger.LogInformation("Attempting to upload a new photo.");
+                _logger.LogInformation("Attempting to upload multiple photos.");
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Invalid model state for uploading a new photo.");
+                    _logger.LogWarning("Invalid model state for uploading photos.");
                     return BadRequest(ModelState);
                 }
 
-                Tuple<int, string,string> fileSaveResult;
-                string? filePath = default;
-                string? fileName = default;
-                
-                if (imageDto.File != null)
+                List<ImageReturnDTO> returnList = new List<ImageReturnDTO>();
+                if (imageDto.Files?.Count > 0)
                 {
-                    fileSaveResult = _imageFileService.SaveFileFolder(imageDto.File, FolderName.Images);
-                    if (fileSaveResult.Item1 == 1)
+                    foreach (var file in imageDto.Files)
                     {
-                        filePath = fileSaveResult.Item2;
-                        fileName = fileSaveResult.Item3;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Image file unsaved.");
-                        return BadRequest(ModelState);
+                        Tuple<int, string, string> fileSaveResult = _imageFileService.SaveFileFolder(file, FolderName.Images);
+
+                        if (fileSaveResult.Item1 != 1)
+                        {
+                            _logger.LogWarning($"Image file {fileSaveResult.Item3} could not be saved: {fileSaveResult.Item2}");
+                            returnList.Add(new ImageReturnDTO
+                            {
+                                FilePath = fileSaveResult.Item2,
+                                Success = false,
+                                ErrorMessage = $"Image file {fileSaveResult.Item3} could not be saved: {fileSaveResult.Item2}"
+                            });
+                            continue; // Skip to the next file if current one failed
+                        }
+
+                        Image image = _mapper.Map<Image>(imageDto);
+                        image.FilePath = fileSaveResult.Item2;
+                        image.Name = fileSaveResult.Item3;
+
+                        try
+                        {
+                            await _repositoryService.InsertAsync(image);
+
+                            // Generate ImageReturnDTO with ImageID
+                            ImageReturnDTO returnObject = _mapper.Map<ImageReturnDTO>(image);
+                            returnObject.Success = true;
+                            returnList.Add(returnObject);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Failed to save image details for file {fileSaveResult.Item3}");
+                            returnList.Add(new ImageReturnDTO
+                            {
+                                FilePath = fileSaveResult.Item2,
+                                Success = false,
+                                ErrorMessage = $"Failed to save image details: {ex.Message}"
+                            });
+                        }
                     }
                 }
-                Image image = _mapper.Map<Image>(imageDto);                
-                image.FilePath = filePath ?? string.Empty; // Ensure filePath is not null
-                image.Name = fileName;
+                if (returnList.Count == 0)
+                {
+                    return BadRequest("No images were uploaded successfully.");
+                }
 
-                await _repositoryService.InsertAsync(image);
-                return CreatedAtAction("GetImage", new { id = image.Id }, image);
+                return Ok(returnList);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                _logger.LogError(ex, "Concurrency conflict when uploading a new photo.");
+                _logger.LogError(ex, "Concurrency conflict when uploading photos.");
                 return StatusCode(409, "Concurrency conflict occurred.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database update error occurred while uploading a new photo.");
-                return StatusCode(500, "A database error occurred while uploading the photo.");
+                _logger.LogError(ex, "Database update error occurred while uploading photos.");
+                return StatusCode(500, "A database error occurred while uploading the photos.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while uploading a new photo.");
+                _logger.LogError(ex, "An unexpected error occurred while uploading photos.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
+
 
         // DELETE: api/Images/5
         [HttpDelete("{id}")]
