@@ -31,7 +31,10 @@ namespace HMS.Models.Admin
 
         //public List<AdminAdditionalInfo>? AdditionalInfo { get; set; }
 
-        //public string? CoverImagePath { get; set; }
+        [NotMapped]
+        public IFormFile? CoverImage { get; set; }
+
+        public string? CoverImagePath { get; set; }
 
         public Guid? CoverImageId { get; set;}
 
