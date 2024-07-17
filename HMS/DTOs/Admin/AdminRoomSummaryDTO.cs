@@ -16,7 +16,7 @@ namespace HMS.DTOs.Admin
 
         public decimal Price { get; set; } = decimal.MinValue;
 
-        public List<AdminCategoryValue> AdminCategoryValues { get; set; } = new List<AdminCategoryValue>();
+        public List<CategoryValue> AdminCategoryValues { get; set; } = new List<CategoryValue>();
 
         public string? CoverImagePath { get; set; }
 
