@@ -1,5 +1,4 @@
 ﻿using HMS.DTOs;
-using HMS.DTOs.Admin;
 using HMS.Models.Admin;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
