@@ -188,25 +188,6 @@ namespace HMS.Migrations
                     b.ToTable("AdminFAQs");
                 });
 
-            modelBuilder.Entity("HMS.Models.Admin.AdminFAQ", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Answer")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AdminFAQs");
-                });
-
             modelBuilder.Entity("HMS.Models.Admin.AdminGenaralCatagory", b =>
                 {
                     b.Property<int>("Id")

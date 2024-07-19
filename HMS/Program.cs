@@ -201,60 +201,60 @@ internal class Program
                 }
 
                 //add temporary room categoryValues 
-                using (var scope = app.Services.CreateScope()) 
-                {
-                    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
-                    var categories = new[] { new AdminCategory { Title= "Category1" }, new AdminCategory { Title = "Category2" } , new AdminCategory { Title = "Category3" } };
+                //using (var scope = app.Services.CreateScope()) 
+                //{
+                //    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
+                //    var categories = new[] { new AdminCategory { Title= "Category1" }, new AdminCategory { Title = "Category2" } , new AdminCategory { Title = "Category3" } };
 
-                    if (dbContext == null)
-                    {
-                        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
-                    }
+                //    if (dbContext == null)
+                //    {
+                //        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
+                //    }
 
-                    foreach (var category in categories)
-                    {
-                        // Check if the value with the same title already exists
-                        var existingCategory = await dbContext.AdminCategories.FirstOrDefaultAsync(a => a.Title == category.Title);
+                //    foreach (var category in categories)
+                //    {
+                //        // Check if the value with the same title already exists
+                //        var existingCategory = await dbContext.AdminCategories.FirstOrDefaultAsync(a => a.Title == category.Title);
 
-                        if (existingCategory == null)
-                            await dbContext.AdminCategories.AddAsync(category);
+                //        if (existingCategory == null)
+                //            await dbContext.AdminCategories.AddAsync(category);
                        
-                        await dbContext.SaveChangesAsync();
-                    }
+                //        await dbContext.SaveChangesAsync();
+                //    }
 
-                }
+                //}
 
                 //add temporary room value values 
-                using (var scope = app.Services.CreateScope())
-                {
-                    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
-                    var categoryValues = new[] { new AdminCategoryValue { Value="Category1Value1", AdminCategoryId=1},
-                                             new AdminCategoryValue { Value="Category1Value2", AdminCategoryId=1 },
-                                             new AdminCategoryValue { Value="Category1Value3", AdminCategoryId=1 },
-                                             new AdminCategoryValue { Value="Category2Value1", AdminCategoryId=2},
-                                             new AdminCategoryValue { Value="Category2Value2", AdminCategoryId=2 },
-                                             new AdminCategoryValue { Value="Category2Value3", AdminCategoryId=2 },
-                                             new AdminCategoryValue { Value="Category3Value1", AdminCategoryId=3},
-                                             new AdminCategoryValue { Value="Category3Value2", AdminCategoryId=3 },
-                                             new AdminCategoryValue { Value="Category3Value3", AdminCategoryId=3 },};
+                //using (var scope = app.Services.CreateScope())
+                //{
+                //    var dbContext = scope.ServiceProvider.GetService<HMSDBContext>();
+                //    var categoryValues = new[] { new AdminCategoryValue { Value="Category1Value1", AdminCategoryId=1},
+                //                             new AdminCategoryValue { Value="Category1Value2", AdminCategoryId=1 },
+                //                             new AdminCategoryValue { Value="Category1Value3", AdminCategoryId=1 },
+                //                             new AdminCategoryValue { Value="Category2Value1", AdminCategoryId=2},
+                //                             new AdminCategoryValue { Value="Category2Value2", AdminCategoryId=2 },
+                //                             new AdminCategoryValue { Value="Category2Value3", AdminCategoryId=2 },
+                //                             new AdminCategoryValue { Value="Category3Value1", AdminCategoryId=3},
+                //                             new AdminCategoryValue { Value="Category3Value2", AdminCategoryId=3 },
+                //                             new AdminCategoryValue { Value="Category3Value3", AdminCategoryId=3 },};
 
-                    if (dbContext == null)
-                    {
-                        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
-                    }
+                //    if (dbContext == null)
+                //    {
+                //        throw new ArgumentNullException(nameof(dbContext), "HMSDBContext is null.");
+                //    }
 
-                    foreach (var value in categoryValues)
-                    {
-                        // Check if the value with the same title already exists
-                        var existingCategory = await dbContext.AdminCategoryValues.FirstOrDefaultAsync(v => v.Value == value.Value && v.AdminCategoryId==value.AdminCategoryId);
+                //    foreach (var value in categoryValues)
+                //    {
+                //        // Check if the value with the same title already exists
+                //        var existingCategory = await dbContext.AdminCategoryValues.FirstOrDefaultAsync(v => v.Value == value.Value && v.AdminCategoryId==value.AdminCategoryId);
 
-                        if (existingCategory == null)
-                            await dbContext.AdminCategoryValues.AddAsync(value);
+                //        if (existingCategory == null)
+                //            await dbContext.AdminCategoryValues.AddAsync(value);
 
-                        await dbContext.SaveChangesAsync();
-                    }
+                //        await dbContext.SaveChangesAsync();
+                //    }
 
-                }
+                //}
             });
         }
         catch (Exception)
