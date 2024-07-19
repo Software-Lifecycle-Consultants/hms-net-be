@@ -98,23 +98,25 @@ namespace HMS.Controllers.Admin
                 // Update Cover Image if needed
                 if (adminBlogDto.CoverImage != null)
                 {
-                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.CoverImage, existingBlog.CoverImagePath);
+                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.CoverImage, existingBlog.CoverImagePath, FolderName.Blogs_CoverImages);
                     if (fileUpdateResult.Item1 != (int)FileStatus.Success)
                     {
                         _logger.LogWarning("Failed to update cover image for Blog with ID: {BlogID}", id);
                         return BadRequest(fileUpdateResult.Item2);
                     }
+                    existingBlog.CoverImagePath = fileUpdateResult.Item2;
                 }
 
                 // Update Author Image if needed
                 if (adminBlogDto.AuthorImage != null)
                 {
-                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.AuthorImage, existingBlog.AuthorImagePath);
+                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.AuthorImage, existingBlog.AuthorImagePath, FolderName.Blogs_AuthorImages);
                     if (fileUpdateResult.Item1 != (int)FileStatus.Success)
                     {
                         _logger.LogWarning("Failed to update author image for Blog with ID: {BlogID}", id);
                         return BadRequest(fileUpdateResult.Item2);
                     }
+                    existingBlog.AuthorImagePath = fileUpdateResult.Item2;
                 }
 
                 _mapper.Map(adminBlogDto, existingBlog);
@@ -142,7 +144,6 @@ namespace HMS.Controllers.Admin
                 return StatusCode(500, "An error occurred while updating the Blog.");
             }
         }
-
 
         // POST: api/AdminBlogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -243,12 +244,6 @@ namespace HMS.Controllers.Admin
                 _imageFileService.DeleteImage(blog.CoverImagePath);
 
                 await _repositoryService.DeleteAsync(blog);
-
-                
-                
-
- 
-
                 _logger.LogInformation("Successfully deleted Blog with ID: {BlogID}", id);
 
                 return NoContent();
