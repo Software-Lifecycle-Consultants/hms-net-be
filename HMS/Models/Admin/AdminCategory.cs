@@ -10,8 +10,11 @@ namespace HMS.Models.Admin
         public int Id { get; set; }
 
         public string Title { get; set; } = string.Empty;
+        [ForeignKey("AdminGenaralCatagoty")]
+        public int AdminGenaralCatagotyId { get; set; }
 
         public List<AdminCategoryValue>? AdminCategoryValues { set; get; } 
+        public AdminGenaralCatagory AdminGenaralCatagoty { get; set; } = null!;
          
     }
    
