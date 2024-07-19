@@ -77,10 +77,6 @@ namespace HMS.Models
 
             //what happen to categoryvalues if AdminCategory values is deleted
 
-        }
-        public DbSet<HMS.Models.Admin.AdminFAQ> AdminFAQ { get; set; } = default!;
-        
-        
-        
+        }      
     }
 }
