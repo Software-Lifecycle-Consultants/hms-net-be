@@ -14,7 +14,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                DbContext.AdminFAQ.Remove(dbObject);
+                DbContext.AdminFAQs.Remove(dbObject);
                 await SaveAsync();
             }
             catch (Exception ex)
@@ -39,7 +39,7 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminFAQ
+                return await DbContext.AdminFAQs
                     .FirstOrDefaultAsync(ar => ar.Id == id);
             }
             catch (Exception ex)
