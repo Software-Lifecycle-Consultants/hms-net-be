@@ -45,7 +45,7 @@ namespace HMS.Migrations
 
                     b.HasIndex("AdminRoomId");
 
-                    b.ToTable("AdminAdditionalInfo");
+                    b.ToTable("AdminAdditionalInfo", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminBlog", b =>
@@ -57,18 +57,12 @@ namespace HMS.Migrations
                     b.Property<string>("AuthorDescription")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("AuthorImagePath")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("AuthorName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("BlogContent")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("CoverImagePath")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Facebook")
@@ -96,7 +90,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminBlogs");
+                    b.ToTable("AdminBlogs", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminCategory", b =>
@@ -111,7 +105,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminCategories");
+                    b.ToTable("AdminCategories", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminCategoryValue", b =>
@@ -136,7 +130,7 @@ namespace HMS.Migrations
 
                     b.HasIndex("AdminRoomId");
 
-                    b.ToTable("AdminCategoryValue");
+                    b.ToTable("AdminCategoryValue", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminContact", b =>
@@ -186,7 +180,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminContacts");
+                    b.ToTable("AdminContacts", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminRoom", b =>
@@ -217,7 +211,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminRooms");
+                    b.ToTable("AdminRooms", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminServiceAddon", b =>
@@ -243,7 +237,7 @@ namespace HMS.Migrations
 
                     b.HasIndex("AdminRoomId");
 
-                    b.ToTable("AdminServiceAddons");
+                    b.ToTable("AdminServiceAddons", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Contact", b =>
@@ -263,7 +257,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contacts");
+                    b.ToTable("Contacts", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Image", b =>
@@ -281,7 +275,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("HMS.Models.Room", b =>
@@ -315,7 +309,7 @@ namespace HMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
