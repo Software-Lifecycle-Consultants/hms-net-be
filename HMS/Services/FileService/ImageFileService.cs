@@ -78,6 +78,9 @@ namespace HMS.Services.FileService
 
         //    return results;
         //}
+
+
+
         public string GenerateUniqueFileName(string directoryPath, string imageName)
         {
             string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(imageName);
@@ -145,7 +148,7 @@ namespace HMS.Services.FileService
             }
         }
 
-        public Tuple<int, string, string> UpdateImageInPlace(IFormFile file, string existingFilePath, FolderName folderName)
+        public Tuple<int, string, string> UpdateImageInPlace(IFormFile file, string existingFilePath)
         {
             try
             {
@@ -165,15 +168,7 @@ namespace HMS.Services.FileService
                     return new Tuple<int, string, string>((int)FileStatus.Fail, message, string.Empty);
                 }
 
-                var contentPath = _environment.ContentRootPath;
-                var directoryPath = Path.Combine(contentPath, "Uploads", folderName.ToString());
-
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
-                if (!string.IsNullOrEmpty(existingFilePath) && File.Exists(existingFilePath))
+                if (File.Exists(existingFilePath))
                 {
                     using (var stream = new FileStream(existingFilePath, FileMode.Create))
                     {
@@ -185,16 +180,8 @@ namespace HMS.Services.FileService
                 }
                 else
                 {
-                    var uniqueFileName = GenerateUniqueFileName(directoryPath, file.FileName);
-                    var newFilePath = Path.Combine(directoryPath, uniqueFileName);
-
-                    using (var stream = new FileStream(newFilePath, FileMode.Create))
-                    {
-                        file.CopyTo(stream);
-                    }
-
-                    _logger.LogInformation("Image file saved successfully at new path: {NewFilePath}", newFilePath);
-                    return new Tuple<int, string, string>((int)FileStatus.Success, newFilePath, uniqueFileName);
+                    _logger.LogWarning("Existing file path does not exist: {ExistingFilePath}", existingFilePath);
+                    return new Tuple<int, string, string>((int)FileStatus.Fail, $"Existing file path does not exist: {existingFilePath}", string.Empty);
                 }
             }
             catch (Exception ex)
@@ -203,10 +190,6 @@ namespace HMS.Services.FileService
                 return new Tuple<int, string, string>((int)FileStatus.Fail, $"An error has occurred while updating image file {ex.Message}", string.Empty);
             }
         }
-
-
-
-
 
 
 
