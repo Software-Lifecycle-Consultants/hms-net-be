@@ -25,6 +25,7 @@ namespace HMS.Models
         public DbSet<AdminServiceAddon> AdminServiceAddons { get; set; }
         public DbSet<AdminContact> AdminContacts { get; set; }
         public DbSet<AdminBlog> AdminBlogs { get; set; }
+        public DbSet<AdminFAQ> AdminFAQs { get; set; }
 
 
 
@@ -76,9 +77,6 @@ namespace HMS.Models
 
             //what happen to categoryvalues if AdminCategory values is deleted
 
-        }
-        
-        
-        
+        }      
     }
 }
