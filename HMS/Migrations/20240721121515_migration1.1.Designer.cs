@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HMS.Migrations
 {
     [DbContext(typeof(HMSDBContext))]
-    [Migration("20240717154045_migration1.1")]
+    [Migration("20240721121515_migration1.1")]
     partial class migration11
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace HMS.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -34,11 +34,19 @@ namespace HMS.Migrations
                     b.Property<string>("AuthorDescription")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("AuthorImagePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("AuthorName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("BlogContent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CoverImagePath")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -157,6 +165,25 @@ namespace HMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AdminContacts");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminFAQ", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminFAQs");
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminRoom", b =>
