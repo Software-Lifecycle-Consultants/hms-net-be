@@ -31,11 +31,19 @@ namespace HMS.Migrations
                     b.Property<string>("AuthorDescription")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("AuthorImagePath")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("AuthorName")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("BlogContent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CoverImagePath")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -159,6 +167,25 @@ namespace HMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AdminContacts");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminFAQ", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminFAQs");
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminFAQ", b =>

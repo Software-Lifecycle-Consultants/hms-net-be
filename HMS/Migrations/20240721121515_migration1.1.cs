@@ -144,7 +144,11 @@ namespace HMS.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LinkedIn = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PublishedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    PublishedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    CoverImagePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthorImagePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -203,6 +207,22 @@ namespace HMS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AdminContacts", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AdminFAQs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Question = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Answer = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdminFAQs", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -268,6 +288,9 @@ namespace HMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "AdminContacts");
+
+            migrationBuilder.DropTable(
+                name: "AdminFAQs");
 
             migrationBuilder.DropTable(
                 name: "CategoryValues");
