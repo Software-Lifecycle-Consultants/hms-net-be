@@ -17,7 +17,7 @@ namespace HMS.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -75,11 +75,16 @@ namespace HMS.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AdminGenaralCatagotyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminGenaralCatagotyId");
 
                     b.ToTable("AdminCategories");
                 });
@@ -154,6 +159,42 @@ namespace HMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AdminContacts");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminFAQ", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminFAQs");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminGenaralCatagory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdminGenaralCatagories");
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminRoom", b =>
@@ -529,6 +570,17 @@ namespace HMS.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HMS.Models.Admin.AdminCategory", b =>
+                {
+                    b.HasOne("HMS.Models.Admin.AdminGenaralCatagory", "AdminGenaralCatagoty")
+                        .WithMany("AdminCategories")
+                        .HasForeignKey("AdminGenaralCatagotyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminGenaralCatagoty");
+                });
+
             modelBuilder.Entity("HMS.Models.Admin.AdminCategoryValue", b =>
                 {
                     b.HasOne("HMS.Models.Admin.AdminCategory", "AdminCategory")
@@ -623,6 +675,11 @@ namespace HMS.Migrations
             modelBuilder.Entity("HMS.Models.Admin.AdminCategory", b =>
                 {
                     b.Navigation("AdminCategoryValues");
+                });
+
+            modelBuilder.Entity("HMS.Models.Admin.AdminGenaralCatagory", b =>
+                {
+                    b.Navigation("AdminCategories");
                 });
 
             modelBuilder.Entity("HMS.Models.Admin.AdminRoom", b =>

@@ -8,6 +8,7 @@ namespace HMS.Models.Admin
         [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public List<AdminCategory>? AdminCategories { set; get; }
+        public List<AdminCategory> AdminCategories { set; get; } = null!;
     }
 }
+    
