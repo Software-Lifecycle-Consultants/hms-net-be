@@ -12,6 +12,7 @@ using HMS.Services.Repository_Service;
 using HMS.DTOs.Admin;
 using HMS.Services.FileService;
 using HMS.Services.Enums;
+using static HMS.Services.FileService.ImageFileService;
 
 namespace HMS.Controllers
 {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HMS.Migrations
 {
     /// <inheritdoc />
-    public partial class migration2 : Migration
+    public partial class migration11 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,6 +15,13 @@ namespace HMS.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_AdminCategories_AdminRooms_AdminRoomId",
                 table: "AdminCategories");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_AdminServiceAddons_AdminRooms_AdminRoomId",
+                table: "AdminServiceAddons");
+
+            migrationBuilder.DropTable(
+                name: "AdminAdditionalInfo");
 
             migrationBuilder.DropIndex(
                 name: "IX_AdminCategories_AdminRoomId",
@@ -77,11 +84,25 @@ namespace HMS.Migrations
                 .OldAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
             migrationBuilder.AddColumn<string>(
-                name: "CoverImagePath",
+                name: "AditionalInfoDescription",
                 table: "AdminRooms",
                 type: "longtext",
                 nullable: true)
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AddColumn<string>(
+                name: "AditionalInfoTitle",
+                table: "AdminRooms",
+                type: "longtext",
+                nullable: true)
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "CoverImageId",
+                table: "AdminRooms",
+                type: "char(36)",
+                nullable: true,
+                collation: "ascii_general_ci");
 
             migrationBuilder.AddColumn<decimal>(
                 name: "Price",
@@ -89,6 +110,16 @@ namespace HMS.Migrations
                 type: "decimal(65,30)",
                 nullable: false,
                 defaultValue: 0m);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Id",
+                table: "AdminCategories",
+                type: "int",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "char(36)")
+                .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
+                .OldAnnotation("Relational:Collation", "ascii_general_ci");
 
             migrationBuilder.CreateTable(
                 name: "AdminBlogs",
@@ -113,7 +144,11 @@ namespace HMS.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     LinkedIn = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PublishedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    PublishedTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    CoverImagePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthorImagePath = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -122,27 +157,22 @@ namespace HMS.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AdminCategoryValue",
+                name: "AdminCategoryValues",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Value = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AdminCategoryId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    AdminRoomId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                    AdminCategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AdminCategoryValue", x => x.Id);
+                    table.PrimaryKey("PK_AdminCategoryValues", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AdminCategoryValue_AdminCategories_AdminCategoryId",
+                        name: "FK_AdminCategoryValues_AdminCategories_AdminCategoryId",
                         column: x => x.AdminCategoryId,
                         principalTable: "AdminCategories",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AdminCategoryValue_AdminRooms_AdminRoomId",
-                        column: x => x.AdminRoomId,
-                        principalTable: "AdminRooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -180,31 +210,104 @@ namespace HMS.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AdminFAQs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Question = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Answer = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdminFAQs", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "CategoryValues",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    AdminCategoryValuesId = table.Column<int>(type: "int", nullable: false),
+                    AdminRoomId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryValues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CategoryValues_AdminCategoryValues_AdminCategoryValuesId",
+                        column: x => x.AdminCategoryValuesId,
+                        principalTable: "AdminCategoryValues",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryValues_AdminRooms_AdminRoomId",
+                        column: x => x.AdminRoomId,
+                        principalTable: "AdminRooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
-                name: "IX_AdminCategoryValue_AdminCategoryId",
-                table: "AdminCategoryValue",
+                name: "IX_AdminCategoryValues_AdminCategoryId",
+                table: "AdminCategoryValues",
                 column: "AdminCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdminCategoryValue_AdminRoomId",
-                table: "AdminCategoryValue",
+                name: "IX_CategoryValues_AdminCategoryValuesId",
+                table: "CategoryValues",
+                column: "AdminCategoryValuesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryValues_AdminRoomId",
+                table: "CategoryValues",
                 column: "AdminRoomId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AdminServiceAddons_AdminRooms_AdminRoomId",
+                table: "AdminServiceAddons",
+                column: "AdminRoomId",
+                principalTable: "AdminRooms",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_AdminServiceAddons_AdminRooms_AdminRoomId",
+                table: "AdminServiceAddons");
+
             migrationBuilder.DropTable(
                 name: "AdminBlogs");
 
             migrationBuilder.DropTable(
-                name: "AdminCategoryValue");
-
-            migrationBuilder.DropTable(
                 name: "AdminContacts");
 
+            migrationBuilder.DropTable(
+                name: "AdminFAQs");
+
+            migrationBuilder.DropTable(
+                name: "CategoryValues");
+
+            migrationBuilder.DropTable(
+                name: "AdminCategoryValues");
+
             migrationBuilder.DropColumn(
-                name: "CoverImagePath",
+                name: "AditionalInfoDescription",
+                table: "AdminRooms");
+
+            migrationBuilder.DropColumn(
+                name: "AditionalInfoTitle",
+                table: "AdminRooms");
+
+            migrationBuilder.DropColumn(
+                name: "CoverImageId",
                 table: "AdminRooms");
 
             migrationBuilder.DropColumn(
@@ -264,6 +367,16 @@ namespace HMS.Migrations
                 .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 .OldAnnotation("Relational:Collation", "ascii_general_ci");
 
+            migrationBuilder.AlterColumn<Guid>(
+                name: "Id",
+                table: "AdminCategories",
+                type: "char(36)",
+                nullable: false,
+                collation: "ascii_general_ci",
+                oldClrType: typeof(int),
+                oldType: "int")
+                .OldAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
+
             migrationBuilder.AddColumn<Guid>(
                 name: "AdminRoomId",
                 table: "AdminCategories",
@@ -278,9 +391,39 @@ namespace HMS.Migrations
                 nullable: false)
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AdminAdditionalInfo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    AdminRoomId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    Adons = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Title = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdminAdditionalInfo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AdminAdditionalInfo_AdminRooms_AdminRoomId",
+                        column: x => x.AdminRoomId,
+                        principalTable: "AdminRooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AdminCategories_AdminRoomId",
                 table: "AdminCategories",
+                column: "AdminRoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdminAdditionalInfo_AdminRoomId",
+                table: "AdminAdditionalInfo",
                 column: "AdminRoomId");
 
             migrationBuilder.AddForeignKey(
@@ -290,6 +433,14 @@ namespace HMS.Migrations
                 principalTable: "AdminRooms",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AdminServiceAddons_AdminRooms_AdminRoomId",
+                table: "AdminServiceAddons",
+                column: "AdminRoomId",
+                principalTable: "AdminRooms",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
         }
     }
 }

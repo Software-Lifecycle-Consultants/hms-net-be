@@ -26,7 +26,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /publishOutput .
 # Command to run the application when the container starts
-ENTRYPOINT ["dotnet", "HMS.dll","--environment=Development"]
+ENTRYPOINT ["dotnet", "HMS.dll","--environment=Production"]
 # Expose port 8080 and 8081 for the application(http/https)
 EXPOSE 7041
 EXPOSE 5010
