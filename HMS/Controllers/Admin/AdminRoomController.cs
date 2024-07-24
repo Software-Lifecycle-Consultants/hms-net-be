@@ -151,10 +151,7 @@ namespace HMS.Controllers.Admin
                     if (await _adminRepository.CategoryValueExists(item.Value))
                     {
                         categoryValues.Add(new CategoryValue { AdminCategoryValuesId = item.Value, AdminRoomId = adminRoom.Id }); ;
-                    }
-                   
-                    //var result = _adminRepository.MapAdminCategory(item.Key,item.Value);
-                    //adminRoomDto.AdminCategoryValues.Add(new AdminCategoryValueDTO { Value = item.Value, AdminCategoryId = result.Id,AdminCategory =result });
+                    }                                      
                 }
                 adminRoom.CategoryValues = categoryValues;
 
@@ -165,12 +162,10 @@ namespace HMS.Controllers.Admin
                 //if (adminRoomDto.CoverImage != null)
                 //{
                 //    fileSaveResult = _imageFileService.SaveFileFolder(adminRoomDto.CoverImage, FolderName.AdminRoom);
-                //    if (fileSaveResult.Item1 == 1)
+                //    if (fileSaveResult.Item1 == (int)Status.Success)
                 //        coverImage = fileSaveResult.Item2;
                 //}
-
-                //AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
-                //adminRoom.CategoryValues.Add(new CategoryValue { });
+                               
                 //adminRoom.CoverImagePath = coverImage;
 
                 await _adminRepository.InsertAsync(adminRoom);
