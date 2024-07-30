@@ -26,6 +26,12 @@ namespace HMS.DTOs.Admin
 
         [JsonIgnore] // Prevent circular reference in Swagger documentation
         public AdminRoom AdminRoom { get; set; } = new AdminRoom();
+        [JsonIgnore]
+        [ForeignKey("AdminGenaralCatagoty")]
+        public Guid? AdminGenaralCatagotyId { get; set; }
+
+        [JsonIgnore]
+        public AdminGenaralCatagory AdminGenaralCatagory { get; set; } = new AdminGenaralCatagory();
     }
 
 
@@ -49,5 +55,11 @@ namespace HMS.DTOs.Admin
 
         [JsonIgnore] // Prevent circular reference in Swagger documentation
         public AdminRoom AdminRoom { get; set; } = new AdminRoom();
+        [JsonIgnore]
+        [ForeignKey("AdminGenaralCatagoty")]
+        public Guid? AdminGenaralCatagotyId { get; set; }
+
+        [JsonIgnore]
+        public AdminGenaralCatagory AdminGenaralCatagory { get; set; } = new AdminGenaralCatagory();
     }
 }

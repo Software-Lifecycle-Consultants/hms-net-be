@@ -26,7 +26,11 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminGenaralCatagories.ToListAsync();
+                return await DbContext.AdminGenaralCatagories
+                    .Include(agc => agc.AdminCategories)
+                    .ThenInclude(ac => ac.AdminCategoryValues)
+                    .ToListAsync();
+  
             }
             catch (Exception ex)
             {
@@ -38,8 +42,11 @@ namespace HMS.Services.RepositoryService
         {
             try
             {
-                return await DbContext.AdminGenaralCatagories
-                    .FirstOrDefaultAsync(ax => ax.Id == id);
+               var result = await DbContext.AdminGenaralCatagories
+                    .Include(agc => agc.AdminCategories)
+                    .ThenInclude(ac => ac.AdminCategoryValues)
+                    .FirstOrDefaultAsync(agc => agc.Id == id);
+                return result;
             }
             catch (Exception ex)
             {

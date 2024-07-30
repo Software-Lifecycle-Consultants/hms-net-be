@@ -15,5 +15,8 @@ namespace HMS.Models.Admin
 
         public AdminCategory AdminCategory { get; set; } = null!; //null forgiving operator.This tells the compiler that you are aware AdminCategory is not initialized in the constructor and you ensure it will be set late
 
+        [ForeignKey("AdminGenaralCatagoty")]
+        public int AdminGenaralCatagotyId { get; set; }
+        public AdminGenaralCatagory AdminGenaralCatagoty { get; set; } = null!;
     }
 }
