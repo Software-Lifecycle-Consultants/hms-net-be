@@ -8,11 +8,13 @@ namespace HMS.Models.Admin
     {
         [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-       
+
+        [StringLength(30, MinimumLength = 10)]
         public string Title { get; set; } = string.Empty;
 
+        [StringLength(300, MinimumLength = 100)]
         public string? Description { get; set; }
-       
+
         public List<string>? Adons { get; set; }
 
         [ForeignKey("AdminRoom")]
@@ -20,5 +22,5 @@ namespace HMS.Models.Admin
 
         [JsonIgnore] // Prevent circular reference in Swagger documentation
         public AdminRoom AdminRoom { get; set; } = new AdminRoom();
-    }    
+    }
 }

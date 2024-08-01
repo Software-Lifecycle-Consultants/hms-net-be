@@ -10,7 +10,7 @@ namespace HMS.Models.Admin
         public Guid Id { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 10)]
+        [StringLength(50, MinimumLength = 5)]
         public string Title { get; set; }= string.Empty;
 
         public string? Subtitle { get; set; }
@@ -19,7 +19,7 @@ namespace HMS.Models.Admin
 
         public string? Description { get; set; }
 
-        public decimal Price { get; set; } = decimal.MinValue;
+        public decimal Price { get; set; }
 
         public List<CategoryValue> CategoryValues { get; set; } = new List<CategoryValue>();
 

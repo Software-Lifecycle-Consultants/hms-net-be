@@ -37,6 +37,14 @@ namespace HMS.Services.MappingService
 
                 foreach (var adminRoom in adminRooms)
                 {
+                    if (!IsValidPrice(adminRoom.Price))
+                    {
+                        decimal correctedPrice = Math.Round(adminRoom.Price,2);
+                        adminRoom.Price = correctedPrice;
+                        _adminRepository.Update(adminRoom);
+                        await _adminRepository.SaveAsync();
+                        //A function should be written to correct if the minus value is entered for the price
+                    }
                     var adminRoomDto = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
                     adminRoomDto.AdminCategoryValues = await GetCategoryValueDTOs(adminRoom);
                     adminRoomReturnDTOs.Add(adminRoomDto);
@@ -49,6 +57,15 @@ namespace HMS.Services.MappingService
                 _logger.LogError(ex, "An error occurred while fetching all AdminRooms.");
                 throw; // Optionally rethrow the exception or handle it as needed.
             }
+        }
+
+        private bool IsValidPrice(decimal Price)
+        {
+            if (Math.Round(Price,2) != Price)
+            {
+                return false;
+            }
+            return true;
         }
 
         private async Task<List<CategoryValueDTO>> GetCategoryValueDTOs(AdminRoom adminRoom) 

@@ -10,19 +10,20 @@ namespace HMS.DTOs.Admin
     public class AdminRoomDTO
     {
         [Required]
-        [StringLength(100, MinimumLength = 5, ErrorMessage = "The Title must be between 5 and 100 characters.")]
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "The Title must be between 5 and 50 characters.")]
         public string Title { get; set; } = string.Empty;
 
-        [StringLength(100)]
+        [StringLength(200)]
         public string? Subtitle { get; set; }
 
-        [StringLength(100)]
+        [StringLength(100, MinimumLength = 20)]
         public string? DescriptionTitle { get; set; }
 
-        [StringLength(500)]
+        [StringLength(600, MinimumLength = 100)]
         public string? Description { get; set; }
 
-        public decimal Price { get; set; } = decimal.MinValue;
+        [RegularExpression(@"^\d+(\.\d{0,2})?$", ErrorMessage = "Price must be a non-negative value maximum of two decimal points.")]
+        public decimal Price { get; set; }
 
         [JsonConverter(typeof(DictionaryStringIntJsonConverter))]
         public Dictionary<int, int> CategoryValuesDictionary { get; set; } = new Dictionary<int, int>();     

@@ -63,6 +63,10 @@ namespace HMS.Models
                 .HasForeignKey(sa => sa.AdminRoomId)
                 .OnDelete(DeleteBehavior.Cascade); // Optional: define set null behavior
 
+            modelBuilder.Entity<AdminRoom>()
+            .Property(a => a.Price)
+            .HasColumnType("DECIMAL(18, 2)");
+
             //modelBuilder.Entity<AdminRoom>()
             //    .HasMany(ar => ar.AdditionalInfo)
             //    .WithOne(ai => ai.AdminRoom)

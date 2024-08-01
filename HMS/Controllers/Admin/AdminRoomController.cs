@@ -265,7 +265,7 @@ namespace HMS.Controllers.Admin
                     return NotFound("No AdminRoom Summeries available.");
                 }
 
-                var AdminRoomSummaryDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomDTO>(adminRoom));
+                var AdminRoomSummaryDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomSummaryDTO>(adminRoom));
                 return Ok(AdminRoomSummaryDTOs);
             }
             catch (Exception ex)
