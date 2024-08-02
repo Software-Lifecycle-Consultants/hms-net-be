@@ -21,6 +21,6 @@ namespace HMS.Models.Admin
         public Guid? AdminRoomId { get; set; }
 
         [JsonIgnore] // Prevent circular reference in Swagger documentation
-        public AdminRoom AdminRoom { get; set; } = new AdminRoom();
+        public AdminRoom AdminRoom { get; set; } = null!;
     }
 }

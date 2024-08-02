@@ -28,7 +28,7 @@ namespace HMS.DTOs.Admin
         [JsonConverter(typeof(DictionaryStringIntJsonConverter))]
         public Dictionary<int, int> CategoryValuesDictionary { get; set; } = new Dictionary<int, int>();     
 
-        public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
+        public AdminServiceAddonDTO? ServiceAddon { get; set; }
 
         public string? AditionalInfoTitle { get; set; }
 

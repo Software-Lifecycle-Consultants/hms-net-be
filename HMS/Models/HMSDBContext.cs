@@ -58,9 +58,9 @@ namespace HMS.Models
                 .OnDelete(DeleteBehavior.Cascade); // Optional: define cascade delete behavior
 
             modelBuilder.Entity<AdminRoom>()
-                .HasMany(ar => ar.ServiceAddons)
+                .HasOne(ar => ar.ServiceAddon)
                 .WithOne(sa => sa.AdminRoom)
-                .HasForeignKey(sa => sa.AdminRoomId)
+                .HasForeignKey<AdminServiceAddon>(sa => sa.AdminRoomId)
                 .OnDelete(DeleteBehavior.Cascade); // Optional: define set null behavior
 
             modelBuilder.Entity<AdminRoom>()

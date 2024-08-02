@@ -23,7 +23,7 @@ namespace HMS.Models.Admin
 
         public List<CategoryValue> CategoryValues { get; set; } = new List<CategoryValue>();
 
-        public List<AdminServiceAddon>? ServiceAddons { get; set; }
+        public AdminServiceAddon? ServiceAddon { get; set; }
 
         public string? AditionalInfoTitle { get; set; }
 
