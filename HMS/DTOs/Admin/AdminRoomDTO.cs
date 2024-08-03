@@ -54,7 +54,7 @@ namespace HMS.DTOs.Admin
 
         public List<CategoryValueDTO>? AdminCategoryValues { get; set; } 
 
-        public List<AdminServiceAddonDTO>? ServiceAddons { get; set; }
+        public AdminServiceAddonDTO? ServiceAddon { get; set; }
 
         public string? AditionalInfoTitle { get; set; }
 
