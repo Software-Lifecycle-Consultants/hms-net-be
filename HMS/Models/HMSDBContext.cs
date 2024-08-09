@@ -75,6 +75,14 @@ namespace HMS.Models
                 .HasForeignKey(cv => cv.AdminCategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<AdminRoom>()
+                .HasMany(r => r.AdminRoomImages)
+                .WithOne(i => i.AdminRoom)
+                .HasForeignKey(i => i.AdminRoomId);
+
+            modelBuilder.Entity<AdminRoomImage>()
+            .Property(b => b.IsCoverImage)
+            .HasDefaultValue(false);
             //what happen to categoryvalues if AdminCategory values is deleted
 
             //mapping IS-A relationship TPT Table Per Type way
