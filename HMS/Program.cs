@@ -79,7 +79,7 @@ internal class Program
         builder.Services.AddScoped<IRepositoryService<Image>, ImageRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
         builder.Services.AddScoped<IRepositoryService<AdminBlog>, AdminBlogRepositoryService>();
-
+        builder.Services.AddScoped<IRepositoryService<AdminRoomImage>, AdminRoomImageRepositoryService>();
         builder.Services.AddScoped<AdminRoomMappingService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
