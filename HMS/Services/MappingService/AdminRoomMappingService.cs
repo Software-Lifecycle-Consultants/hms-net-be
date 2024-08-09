@@ -37,6 +37,14 @@ namespace HMS.Services.MappingService
 
                 foreach (var adminRoom in adminRooms)
                 {
+                    if (!IsValidPrice(adminRoom.Price))
+                    {
+                        decimal correctedPrice = Math.Round(adminRoom.Price,2);
+                        adminRoom.Price = correctedPrice;
+                        _adminRepository.Update(adminRoom);
+                        await _adminRepository.SaveAsync();
+                        //A function should be written to correct if the minus value is entered for the price
+                    }
                     var adminRoomDto = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
                     adminRoomDto.AdminCategoryValues = await GetCategoryValueDTOs(adminRoom);
                     adminRoomReturnDTOs.Add(adminRoomDto);
@@ -49,6 +57,46 @@ namespace HMS.Services.MappingService
                 _logger.LogError(ex, "An error occurred while fetching all AdminRooms.");
                 throw; // Optionally rethrow the exception or handle it as needed.
             }
+        }
+
+        public async Task<AdminRoomReturnDTO?> GetAdminRoomById(Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching AdminRoom by ID: {AdminRoomId}", id);
+                var adminRoom = await _adminRepository.GetByIdAsync(id);
+                if (adminRoom == null)
+                {
+                    _logger.LogWarning("AdminRoom with ID {AdminRoomId} not found", id);
+                    return null;
+                }
+
+                if (!IsValidPrice(adminRoom.Price))
+                {
+                    decimal correctedPrice = Math.Round(adminRoom.Price, 2);
+                    adminRoom.Price = correctedPrice;
+                    _adminRepository.Update(adminRoom);
+                    await _adminRepository.SaveAsync();
+                }
+
+                var adminRoomDto = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
+                adminRoomDto.AdminCategoryValues = await GetCategoryValueDTOs(adminRoom);
+
+                return adminRoomDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching AdminRoom by ID: {AdminRoomId}", id);
+                throw;
+            }
+        }
+        private bool IsValidPrice(decimal Price)
+        {
+            if (Math.Round(Price,2) != Price)
+            {
+                return false;
+            }
+            return true;
         }
 
         private async Task<List<CategoryValueDTO>> GetCategoryValueDTOs(AdminRoom adminRoom) 
