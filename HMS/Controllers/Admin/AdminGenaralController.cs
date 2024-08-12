@@ -17,9 +17,9 @@ namespace HMS.Controllers.Admin
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminGenaralCatagoriesController : HMSControllerBase<AdminGenaralCatagoriesController, AdminGenaralCatagory>
+    public class AdminGenaralController : HMSControllerBase<AdminGenaralController, AdminGenaralCatagory>
     {
-        public AdminGenaralCatagoriesController(ILogger<AdminGenaralCatagoriesController> logger, IRepositoryService<AdminGenaralCatagory> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) { }
+        public AdminGenaralController(ILogger<AdminGenaralController> logger, IRepositoryService<AdminGenaralCatagory> repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) { }
 
  
 
@@ -69,54 +69,54 @@ namespace HMS.Controllers.Admin
             }
         }
 
-        // PUT: api/AdminGenaralCatagories/5
+       // PUT: api/AdminGenaralCatagories/5
+         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAdminGenaralCatagory(Guid id, AdminGenaralCatagoryDTO adminGenaralCatagoryDto)
+        {
+            try
+            {
+                _logger.LogInformation("Updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Invalid model state for the AdminGenaralCatagory ID {AdminGenaralCatagoryId}", id);
+                    return BadRequest(ModelState);
+                }
+                var existingAdminGenaralCatagory = await _repositoryService.GetByIdAsync(id);
+                if (existingAdminGenaralCatagory == null)
+                {
+                    _logger.LogWarning("AdminGenaralCatagory with ID {AdminGenaralCatagoryId} not found", id);
+                    return NotFound("AdminGenaralCatagory not found.");
+                }
+                _mapper.Map(adminGenaralCatagoryDto, existingAdminGenaralCatagory);
+                existingAdminGenaralCatagory.Id = id;
+
+                _repositoryService.Update(existingAdminGenaralCatagory);
+                await _repositoryService.SaveAsync();
+                _logger.LogInformation("AdminGenaralCatagory updated successfully with ID: {AdminGenaralCatagoryId}", id);
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(ex, "Concurrency conflict when updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
+                return StatusCode(409, "Concurrency conflict occurred.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error occurred while updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
+                return StatusCode(500, "A database error occurred while updating the AdminGenaralCatagory.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
+                return StatusCode(500, "An error occurred while updating the AdminGenaralCatagory.");
+            }
+        }
+
+
+        // POST: api/AdminGenaralCatagories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutAdminGenaralCatagory(Guid id, AdminGenaralCatagoryDTO adminGenaralCatagoryDto)
-        //{
-        //    try
-        //    {
-        //        _logger.LogInformation("Updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
-        //        if (!ModelState.IsValid)
-        //        {
-        //            _logger.LogWarning("Invalid model state for the AdminGenaralCatagory ID {AdminGenaralCatagoryId}", id);
-        //            return BadRequest(ModelState);
-        //        }
-        //        var existingAdminGenaralCatagory = await _repositoryService.GetByIdAsync(id);
-        //        if (existingAdminGenaralCatagory == null)
-        //        {
-        //            _logger.LogWarning("AdminGenaralCatagory with ID {AdminGenaralCatagoryId} not found", id);
-        //            return NotFound("AdminGenaralCatagory not found.");
-        //        }
-        //        _mapper.Map(adminGenaralCatagoryDto, existingAdminGenaralCatagory);
-        //        existingAdminGenaralCatagory.Id = id;
-
-        //        _repositoryService.Update(existingAdminGenaralCatagory);
-        //        await _repositoryService.SaveAsync();
-        //        _logger.LogInformation("AdminGenaralCatagory updated successfully with ID: {AdminGenaralCatagoryId}", id);
-        //        return NoContent();
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        _logger.LogError(ex, "Concurrency conflict when updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
-        //        return StatusCode(409, "Concurrency conflict occurred.");
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        _logger.LogError(ex, "Database update error occurred while updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
-        //        return StatusCode(500, "A database error occurred while updating the AdminGenaralCatagory.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "An error occurred while updating AdminGenaralCatagory with ID: {AdminGenaralCatagoryId}", id);
-        //        return StatusCode(500, "An error occurred while updating the AdminGenaralCatagory.");
-        //    }
-        //}
-        
-
-            // POST: api/AdminGenaralCatagories
-            // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-            [HttpPost]
+        [HttpPost]
         public async Task<ActionResult<AdminGenaralCatagory>> PostAdminGenaralCatagory(AdminGenaralCatagoryDTO adminGenaralCatagoryDto)
         {
             try
@@ -124,15 +124,42 @@ namespace HMS.Controllers.Admin
                 _logger.LogInformation("Creating a new AdminGenaralCatagory");
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Invalid model state for the AdminGenaralCatagory");
+                    _logger.LogWarning("Invalid model state for the AdminGenaralCatagory");     
                     return BadRequest(ModelState);
                 }
 
-                AdminGenaralCatagory AdminGenaralCatagory = _mapper.Map<AdminGenaralCatagory>(adminGenaralCatagoryDto);
-                await _repositoryService.InsertAsync(AdminGenaralCatagory);
-                AdminGenaralCatagoryDTO resultDto = _mapper.Map<AdminGenaralCatagoryDTO>(AdminGenaralCatagory);
+                AdminGenaralCatagory adminGenaralCatagory = _mapper.Map<AdminGenaralCatagory>(adminGenaralCatagoryDto);
+               List<AdminCategory> AdminCategories = new List<AdminCategory>();
+                //foreach (var item in adminGenaralCatagoryDto.AdminCategories)
+                //{
+                //    if (await _adminRepository.CategoryValueExists(item.Value))
+                //    {
+                //        AdminCategories.Add(new AdminCategory { AdminGenaralCatagotyId = item.Value, AdminGenaralCatagoryId = adminGenaralCatagory.Id }); ;
+                //    }
+                //}
+                //adminGenaralCatagory.AdminCategories = AdminCategories;
+                //await _adminRepository.InsertAsync(adminGenaralCatagory);
+
+
+                //AdminGenaralCatagoryDTO resultDto = _mapper.Map<AdminGenaralCatagoryDTO>(AdminGenaralCatagory);
+                //List<AdminCategoryGenaralDTO> AdminCategoryGenaralDTOs = new List<AdminCategoryGenaralDTO>();
+                //foreach (var item in AdminGenaralCatagory.AdminCategories)
+                //{
+                //    var result = await _adminRepository.MapAdminCategory(item.Id);
+                //    AdminCategoryGenaralDTO adminCategoryGenaralDTO = new AdminCategoryGenaralDTO();
+                //    adminCategoryGenaralDTO.Id = item.Id;
+                //    adminCategoryGenaralDTO.Title = result!.Item1;
+                //    AdminCategoryGenaralDTOs.Add(adminCategoryGenaralDTO);
+
+                //}
+                //resultDto.AdminCategories = AdminCategoryGenaralDTOs;
+                //_logger.LogInformation("AdminGenaralCatagory created successfully");
+                //return CreatedAtAction("GetAdminGenaralCatagory", new { id = AdminGenaralCatagory.Id }, resultDto);
+
+                await _repositoryService.InsertAsync(adminGenaralCatagory);
+                AdminGenaralCatagoryDTO resultDto = _mapper.Map<AdminGenaralCatagoryDTO>(adminGenaralCatagory);
                 _logger.LogInformation("AdminGenaralCatagory created successfully");
-                return CreatedAtAction("GetAdminGenaralCatagory", new { id = AdminGenaralCatagory.Id }, resultDto);
+                return CreatedAtAction("GetAdminGenaralCatagory", new { id = adminGenaralCatagory.Id }, resultDto);
             }
             catch (DbUpdateConcurrencyException ex)
             {

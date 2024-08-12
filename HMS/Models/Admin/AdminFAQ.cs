@@ -13,5 +13,8 @@ namespace HMS.Models.Admin
         
         [Required]
         public string Answer { get; set; } = string.Empty;
+        [ForeignKey("AdminGenaralCatagoty")]
+        public Guid AdminGenaralCatagotyId { get; set; }
+        public AdminGenaralCatagory AdminGenaralCatagoty { get; set; } = null!;
     }
 }

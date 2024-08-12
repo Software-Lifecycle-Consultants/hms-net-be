@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HMS.Services.RepositoryService
 {
-    public class AdminGenaralCatagoryRepositoryService : RepositoryServiceBase<AdminGenaralCatagory, AdminGenaralCatagoryRepositoryService>
+    public class AdminGenaralCatagoryRepositoryService : RepositoryServiceBase<AdminGenaralCatagory, AdminGenaralCatagoryRepositoryService>, IRepositoryService<AdminGenaralCatagory>
     {
         public AdminGenaralCatagoryRepositoryService(HMSDBContext context, ILogger<AdminGenaralCatagoryRepositoryService>logger) : base(context, logger) 
         { 
@@ -22,6 +22,7 @@ namespace HMS.Services.RepositoryService
                 RepoLogger.LogError("Exception at DeleteAsync: {0}", ex.Message);    
             }
         }
+
         public async Task<IEnumerable<AdminGenaralCatagory>> GetAllAsync()
         {
             try
@@ -38,7 +39,7 @@ namespace HMS.Services.RepositoryService
                 throw;
             }
         }
-        public async Task<AdminGenaralCatagory?> GetByIdAsync(int id)
+        public async Task<AdminGenaralCatagory?> GetByIdAsync(Guid id)
         {
             try
             {
@@ -68,7 +69,7 @@ namespace HMS.Services.RepositoryService
             }
         }
 
-        public async Task<bool> ItemExistsAsync(int id)
+        public async Task<bool> ItemExistsAsync(Guid id)
         {
             try
             {

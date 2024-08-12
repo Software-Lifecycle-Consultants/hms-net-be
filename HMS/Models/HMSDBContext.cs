@@ -81,6 +81,18 @@ namespace HMS.Models
                 .WithOne(c => c.AdminGenaralCatagoty)
                 .HasForeignKey(c => c.AdminGenaralCatagotyId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<AdminGenaralCatagory>()
+                .HasMany(gc => gc.AdminFAQs)
+                .WithOne(f => f.AdminGenaralCatagoty)
+                .HasForeignKey(f => f.AdminGenaralCatagotyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<AdminGenaralCatagory>()
+            //    .HasMany(gc => gc.AdminCategoriesValues)
+            //    .WithOne(cv => cv.AdminGenaralCatagoty)
+            //    .HasForeignKey(cv => cv.AdminGenaralCatagotyId)
+            //    .OnDelete(DeleteBehavior.Cascade);
             //what happen to categoryvalues if AdminCategory values is deleted
 
         }      
