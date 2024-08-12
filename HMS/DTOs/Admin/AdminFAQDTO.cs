@@ -15,8 +15,6 @@ namespace HMS.DTOs.Admin
         [Required]
         [StringLength(100)]
         public string Answer { get; set; } = string.Empty;
-        [ForeignKey("AdminGenaralCatagoty")]
-        public Guid AdminGenaralCatagotyId { get; set; }
-        public AdminGenaralCatagory AdminGenaralCatagoty { get; set; } = null!;
+        
     }
 }

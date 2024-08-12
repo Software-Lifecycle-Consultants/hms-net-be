@@ -11,9 +11,20 @@ namespace HMS.DTOs.Admin
     {
         
         public List<AdminCategoryGenaralDTO> AdminCategories { set; get; } = null!;
+
+
+    }
+    public class AdminCommonGenaralCatagoryDTO
+    {
+
+        public List<AdminCategoryGenaralDTO> AdminCategories { set; get; } = null!;
         public List<AdminFAQDTOs> AdminFAQs { set; get; } = null!;
 
 
+    }
+    public class AdminGenaralFAQDTO
+    {
+        public List<AdminFAQDTOs> AdminFAQs { set; get; } = null!;
     }
     public class AdminFAQDTOs
     { 

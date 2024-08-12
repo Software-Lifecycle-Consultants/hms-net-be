@@ -112,6 +112,44 @@ namespace HMS.Controllers.Admin
                 return StatusCode(500, "An error occurred while updating the AdminGenaralCatagory.");
             }
         }
+        // POST: api/AdminGenaralFAQs
+        [HttpPost ("FAQ")]
+        public async Task<ActionResult<AdminGenaralCatagory>> PostAdminFAQs(AdminGenaralFAQDTO adminGenaralFAQdto)
+        {
+            try
+            {
+                _logger.LogInformation("creating new faq");
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("invalid model state ");
+                    return BadRequest(ModelState);
+                }
+                AdminGenaralCatagory adminGenaralCatagory = _mapper.Map<AdminGenaralCatagory>(adminGenaralFAQdto);
+                List<AdminFAQ> adminFAQs = new List<AdminFAQ>();
+                await _repositoryService.InsertAsync(adminGenaralCatagory);
+                AdminGenaralFAQDTO adminGenaralFAQDTO = _mapper.Map<AdminGenaralFAQDTO>(adminGenaralCatagory);
+                return AcceptedAtAction("GetAdminGenaralCatagory", new { id = adminGenaralCatagory.Id }, adminGenaralFAQDTO);
+
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(ex, "Concurrency conflict when creating a new FAQ.");
+                return StatusCode(409, "Concurrency conflict occurred.");
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log database update exceptions
+                _logger.LogError(ex, "Database update error occurred while creating a new FAQ .");
+                return StatusCode(500, "A database error occurred while creating the FAQ.");
+            }
+            catch (Exception ex)
+            {
+                // Log unexpected exceptions
+                _logger.LogError(ex, "An unexpected error occurred while creating a new admin FAQ .");
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+
+        }
 
 
         // POST: api/AdminGenaralCatagories

@@ -39,6 +39,8 @@ namespace HMS.Mappings
             CreateMap<AdminCategoryGenaralDTO, AdminCategory>().ReverseMap();
             CreateMap<AdminCategoryValueGenaralDTO, AdminCategoryValue>().ReverseMap();
             CreateMap<AdminFAQDTOs, AdminFAQ>().ReverseMap();
+            CreateMap<AdminCommonGenaralCatagoryDTO, AdminGenaralCatagory>().ReverseMap();
+            CreateMap<AdminGenaralFAQDTO, AdminGenaralCatagory>().ReverseMap();
             CreateMap<AdminRoomImage, AdminRoomImageReturnDTO>()
              .ForMember(dest => dest.RoomId, opt => opt.MapFrom(src => src.AdminRoomId))
              .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
