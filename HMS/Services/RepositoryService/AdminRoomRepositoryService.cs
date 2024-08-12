@@ -35,7 +35,7 @@ namespace HMS.Services.RepositoryService
                     .Include(ar => ar.CategoryValues)
                         .ThenInclude(cv => cv.AdminCategoryValues) // Include AdminCategory inside CategoryValues
                           .ThenInclude(acv=> acv.AdminCategory)
-                    .Include(ar => ar.ServiceAddons)                    
+                    .Include(ar => ar.ServiceAddon)                    
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -55,7 +55,7 @@ namespace HMS.Services.RepositoryService
                     .Include(ar => ar.CategoryValues)
                         .ThenInclude(cv => cv.AdminCategoryValues) // Include AdminCategory inside CategoryValues
                           .ThenInclude(acv => acv.AdminCategory)
-                    .Include(ar => ar.ServiceAddons)
+                    .Include(ar => ar.ServiceAddon)
                     .FirstOrDefaultAsync(ar => ar.Id == id);
                 return result;
             }

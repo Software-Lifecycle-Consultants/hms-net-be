@@ -1,7 +1,8 @@
 ﻿namespace HMS.Services.Enums
 {
-    public class Enum
+    public enum Status
     {
+        Fail = 0, Success = 1,
     }
     public enum FolderName
     {

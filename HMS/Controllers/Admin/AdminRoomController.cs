@@ -25,12 +25,12 @@ namespace HMS.Controllers.Admin
         private readonly IFileService _imageFileService;
         private readonly AdminRoomMappingService _mappingService; //see if you can take this to baseclass with an interface
 
-        public AdminRoomController(AdminRoomMappingService mappingService,IFileService imageFileService,ILogger<AdminRoomController> logger, IAdminRepositoryService repositoryService, IMapper mapper) : base(logger, repositoryService, mapper) 
+        public AdminRoomController(AdminRoomMappingService mappingService,IFileService imageFileService,ILogger<AdminRoomController> logger, IAdminRepositoryService repositoryService, IMapper mapper) : base(logger, repositoryService, mapper)
         {
             _imageFileService = imageFileService;
             _mappingService = mappingService;
         }
-                
+
         // GET: api/AdminRooms
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AdminRoomReturnDTO>>> GetAdminRooms()
@@ -62,15 +62,14 @@ namespace HMS.Controllers.Admin
             {
                 _logger.LogInformation("Fetching AdminRoom by ID: {AdminRoomId}", id);
 
-                var adminRoom = await _adminRepository.GetByIdAsync(id);
+                var adminRoomReturnDTO = await _mappingService.GetAdminRoomById(id);
 
-                if (adminRoom == null)
+                if (adminRoomReturnDTO == null)
                 {
                     _logger.LogWarning("AdminRoom with ID {AdminRoomId} not found", id);
                     return NotFound("AdminRoom not found.");
                 }
 
-                var adminRoomReturnDTO = _mapper.Map<AdminRoomReturnDTO>(adminRoom);
                 return Ok(adminRoomReturnDTO);
             }
             catch (Exception ex)
@@ -151,10 +150,7 @@ namespace HMS.Controllers.Admin
                     if (await _adminRepository.CategoryValueExists(item.Value))
                     {
                         categoryValues.Add(new CategoryValue { AdminCategoryValuesId = item.Value, AdminRoomId = adminRoom.Id }); ;
-                    }
-                   
-                    //var result = _adminRepository.MapAdminCategory(item.Key,item.Value);
-                    //adminRoomDto.AdminCategoryValues.Add(new AdminCategoryValueDTO { Value = item.Value, AdminCategoryId = result.Id,AdminCategory =result });
+                    }                                      
                 }
                 adminRoom.CategoryValues = categoryValues;
 
@@ -165,12 +161,10 @@ namespace HMS.Controllers.Admin
                 //if (adminRoomDto.CoverImage != null)
                 //{
                 //    fileSaveResult = _imageFileService.SaveFileFolder(adminRoomDto.CoverImage, FolderName.AdminRoom);
-                //    if (fileSaveResult.Item1 == 1)
+                //    if (fileSaveResult.Item1 == (int)Status.Success)
                 //        coverImage = fileSaveResult.Item2;
                 //}
-
-                //AdminRoom adminRoom = _mapper.Map<AdminRoom>(adminRoomDto);
-                //adminRoom.CategoryValues.Add(new CategoryValue { });
+                               
                 //adminRoom.CoverImagePath = coverImage;
 
                 await _adminRepository.InsertAsync(adminRoom);
@@ -265,7 +259,7 @@ namespace HMS.Controllers.Admin
                     return NotFound("No AdminRoom Summeries available.");
                 }
 
-                var AdminRoomSummaryDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomDTO>(adminRoom));
+                var AdminRoomSummaryDTOs = adminRooms.Select(adminRoom => _mapper.Map<AdminRoomSummaryDTO>(adminRoom));
                 return Ok(AdminRoomSummaryDTOs);
             }
             catch (Exception ex)
