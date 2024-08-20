@@ -3,7 +3,9 @@ using HMS.DTOs.Admin;
 using HMS.Models.Admin;
 using HMS.Services.Enums;
 using HMS.Services.FileService;
+using HMS.Services.MappingService;
 using HMS.Services.Repository_Service;
+using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static HMS.Services.FileService.ImageFileService;
@@ -15,62 +17,41 @@ namespace HMS.Controllers.Admin
     public class AdminBlogsController : HMSControllerBase<AdminBlogsController, AdminBlog>
     {
         private readonly IFileService _imageFileService;
-        public AdminBlogsController(ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService, IMapper mapper, IFileService fileService) : base(logger, repositoryService, mapper)
+        private readonly AdminBlogMappingService _mappingService;
+        
+
+        public AdminBlogsController(AdminBlogMappingService mappingService, IFileService imageFileService,IMapper mapper, ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService) : base(logger, repositoryService, mapper)
         {
-            _imageFileService = fileService;
+            _mappingService = mappingService;
+            _imageFileService = imageFileService;
+
         }
 
         // GET: api/AdminBlogs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AdminBlogReturnDTO>>> GetBlogs()
         {
-            try
+            var blogs = await _mappingService.GetBlogsAsync();
+            if (!blogs.Any())
             {
-                _logger.LogInformation("Fetching all Blogs.");
-
-                var blogs = await _repositoryService.GetAllAsync();
-
-                if (blogs == null || !blogs.Any())
-                {
-                    _logger.LogWarning("No Blogs found.");
-                    return NotFound("No Blogs available.");
-                }
-
-                var adminBlogReturnDTOs = blogs.Select(blog => _mapper.Map<AdminBlogReturnDTO>(blog));
-                return Ok(adminBlogReturnDTOs);
+                return NotFound("No Blogs available.");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while fetching all Blogs.");
-                return StatusCode(500, "An error occurred while retrieving Blogs.");
-            }
-
+            return Ok(blogs);
         }
 
         // GET: api/AdminBlogs/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminBlogReturnDTO>> GetBlog(Guid id)
+        public async Task<IActionResult> GetBlog(Guid id)
         {
-            try
+            _logger.LogInformation("Fetching blog with ID: {BlogId}", id);
+
+            var blogDto = await _mappingService.GetBlogByIdAsync(id);
+            if (blogDto == null)
             {
-                _logger.LogInformation("Fetching Blog by ID: {BlogID}", id);
-
-                var blog = await _repositoryService.GetByIdAsync(id);
-
-                if (blog == null)
-                {
-                    _logger.LogWarning("Blog with ID {BlogID} not found", id);
-                    return NotFound("Blog not found.");
-                }
-
-                var adminBlogReturnDTO = _mapper.Map<AdminBlogReturnDTO>(blog);
-                return Ok(adminBlogReturnDTO);
+                _logger.LogWarning("Blog with ID {BlogId} not found", id);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while fetching Blog by ID: {BlogID}", id);
-                return StatusCode(500, "An error occurred while retrieving Blog.");
-            }
+            return Ok(blogDto);
         }
 
         // PUT: api/AdminBlogs/5

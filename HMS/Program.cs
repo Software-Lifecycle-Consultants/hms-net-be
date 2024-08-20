@@ -81,6 +81,7 @@ internal class Program
         builder.Services.AddScoped<IRepositoryService<AdminBlog>, AdminBlogRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<AdminRoomImage>, AdminRoomImageRepositoryService>();
         builder.Services.AddScoped<AdminRoomMappingService>();
+        builder.Services.AddScoped<AdminBlogMappingService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));
 
         var app = builder.Build();
