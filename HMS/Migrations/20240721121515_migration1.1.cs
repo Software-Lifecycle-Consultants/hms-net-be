@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HMS.Migrations
 {
     /// <inheritdoc />
-    public partial class migration2 : Migration
+    public partial class migration11 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,10 +22,6 @@ namespace HMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "AdminAdditionalInfo");
-
-            migrationBuilder.DropIndex(
-                name: "IX_AdminServiceAddons_AdminRoomId",
-                table: "AdminServiceAddons");
 
             migrationBuilder.DropIndex(
                 name: "IX_AdminCategories_AdminRoomId",
@@ -87,41 +83,6 @@ namespace HMS.Migrations
                 oldType: "int")
                 .OldAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Title",
-                table: "AdminServiceAddons",
-                type: "varchar(30)",
-                maxLength: 30,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "longtext")
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "AdminServiceAddons",
-                type: "varchar(300)",
-                maxLength: 300,
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "longtext",
-                oldNullable: true)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Title",
-                table: "AdminRooms",
-                type: "varchar(50)",
-                maxLength: 50,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "varchar(100)",
-                oldMaxLength: 100)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.AddColumn<string>(
                 name: "AditionalInfoDescription",
                 table: "AdminRooms",
@@ -146,7 +107,7 @@ namespace HMS.Migrations
             migrationBuilder.AddColumn<decimal>(
                 name: "Price",
                 table: "AdminRooms",
-                type: "DECIMAL(18,2)",
+                type: "decimal(65,30)",
                 nullable: false,
                 defaultValue: 0m);
 
@@ -292,12 +253,6 @@ namespace HMS.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdminServiceAddons_AdminRoomId",
-                table: "AdminServiceAddons",
-                column: "AdminRoomId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AdminCategoryValues_AdminCategoryId",
                 table: "AdminCategoryValues",
                 column: "AdminCategoryId");
@@ -342,10 +297,6 @@ namespace HMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "AdminCategoryValues");
-
-            migrationBuilder.DropIndex(
-                name: "IX_AdminServiceAddons_AdminRoomId",
-                table: "AdminServiceAddons");
 
             migrationBuilder.DropColumn(
                 name: "AditionalInfoDescription",
@@ -416,41 +367,6 @@ namespace HMS.Migrations
                 .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 .OldAnnotation("Relational:Collation", "ascii_general_ci");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Title",
-                table: "AdminServiceAddons",
-                type: "longtext",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "varchar(30)",
-                oldMaxLength: 30)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "AdminServiceAddons",
-                type: "longtext",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "varchar(300)",
-                oldMaxLength: 300,
-                oldNullable: true)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Title",
-                table: "AdminRooms",
-                type: "varchar(100)",
-                maxLength: 100,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "varchar(50)",
-                oldMaxLength: 50)
-                .Annotation("MySql:CharSet", "utf8mb4")
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.AlterColumn<Guid>(
                 name: "Id",
                 table: "AdminCategories",
@@ -499,11 +415,6 @@ namespace HMS.Migrations
                         onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AdminServiceAddons_AdminRoomId",
-                table: "AdminServiceAddons",
-                column: "AdminRoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdminCategories_AdminRoomId",

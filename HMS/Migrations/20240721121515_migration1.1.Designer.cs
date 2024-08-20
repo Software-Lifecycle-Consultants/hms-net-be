@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HMS.Migrations
 {
     [DbContext(typeof(HMSDBContext))]
-    [Migration("20240802025955_migration2")]
-    partial class migration2
+    [Migration("20240721121515_migration1.1")]
+    partial class migration11
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -208,15 +208,15 @@ namespace HMS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("DECIMAL(18, 2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Subtitle")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
@@ -236,18 +236,15 @@ namespace HMS.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminRoomId")
-                        .IsUnique();
+                    b.HasIndex("AdminRoomId");
 
                     b.ToTable("AdminServiceAddons");
                 });
@@ -576,8 +573,8 @@ namespace HMS.Migrations
             modelBuilder.Entity("HMS.Models.Admin.AdminServiceAddon", b =>
                 {
                     b.HasOne("HMS.Models.Admin.AdminRoom", "AdminRoom")
-                        .WithOne("ServiceAddon")
-                        .HasForeignKey("HMS.Models.Admin.AdminServiceAddon", "AdminRoomId")
+                        .WithMany("ServiceAddons")
+                        .HasForeignKey("AdminRoomId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("AdminRoom");
@@ -662,7 +659,7 @@ namespace HMS.Migrations
                 {
                     b.Navigation("CategoryValues");
 
-                    b.Navigation("ServiceAddon");
+                    b.Navigation("ServiceAddons");
                 });
 #pragma warning restore 612, 618
         }
