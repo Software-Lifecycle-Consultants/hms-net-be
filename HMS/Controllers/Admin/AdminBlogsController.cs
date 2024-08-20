@@ -3,9 +3,12 @@ using HMS.DTOs.Admin;
 using HMS.Models.Admin;
 using HMS.Services.Enums;
 using HMS.Services.FileService;
+using HMS.Services.MappingService;
 using HMS.Services.Repository_Service;
+using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using static HMS.Services.FileService.ImageFileService;
 
 namespace HMS.Controllers.Admin
@@ -15,9 +18,11 @@ namespace HMS.Controllers.Admin
     public class AdminBlogsController : HMSControllerBase<AdminBlogsController, AdminBlog>
     {
         private readonly IFileService _imageFileService;
-        public AdminBlogsController(ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService, IMapper mapper, IFileService fileService) : base(logger, repositoryService, mapper)
+        private readonly AdminBlogMappingService _mappingService;
+        public AdminBlogsController(AdminBlogMappingService mappingService, ILogger<AdminBlogsController> logger, IRepositoryService<AdminBlog> repositoryService, IMapper mapper, IFileService fileService) : base(logger, repositoryService, mapper)
         {
             _imageFileService = fileService;
+            _mappingService = mappingService;
         }
 
         // GET: api/AdminBlogs
@@ -30,14 +35,12 @@ namespace HMS.Controllers.Admin
 
                 var blogs = await _repositoryService.GetAllAsync();
 
-                if (blogs == null || !blogs.Any())
+                if (!blogs.Any())
                 {
                     _logger.LogWarning("No Blogs found.");
                     return NotFound("No Blogs available.");
                 }
-
-                var adminBlogReturnDTOs = blogs.Select(blog => _mapper.Map<AdminBlogReturnDTO>(blog));
-                return Ok(adminBlogReturnDTOs);
+                return Ok(blogs);
             }
             catch (Exception ex)
             {
@@ -60,11 +63,10 @@ namespace HMS.Controllers.Admin
                 if (blog == null)
                 {
                     _logger.LogWarning("Blog with ID {BlogID} not found", id);
-                    return NotFound("Blog not found.");
+                    return NotFound("No Blog found.");
                 }
 
-                var adminBlogReturnDTO = _mapper.Map<AdminBlogReturnDTO>(blog);
-                return Ok(adminBlogReturnDTO);
+                return Ok(blog);
             }
             catch (Exception ex)
             {
@@ -88,60 +90,17 @@ namespace HMS.Controllers.Admin
                     return BadRequest(ModelState);
                 }
 
-                var existingBlog = await _repositoryService.GetByIdAsync(id);
-                if (existingBlog == null)
+                var result = await _mappingService.PutBlog(id, adminBlogDto);
+                if (result == null)
                 {
-                    _logger.LogWarning("Blog with ID: {BlogID} not found for update.", id);
-                    return NotFound($"No Blog found with ID {id}.");
+                    _logger.LogWarning("Blog with ID: {BlogId} not found for update.", id);
+                    return NotFound("No Blog found for update.");
                 }
-
-                // Update Cover Image if needed
-                if (adminBlogDto.CoverImage != null)
-                {
-                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.CoverImage, existingBlog.CoverImagePath, FolderName.Blogs_CoverImages);
-                    if (fileUpdateResult.Item1 != (int)FileStatus.Success)
-                    {
-                        _logger.LogWarning("Failed to update cover image for Blog with ID: {BlogID}", id);
-                        return BadRequest(fileUpdateResult.Item2);
-                    }
-                    existingBlog.CoverImagePath = fileUpdateResult.Item2;
-                }
-
-                // Update Author Image if needed
-                if (adminBlogDto.AuthorImage != null)
-                {
-                    var fileUpdateResult = _imageFileService.UpdateImageInPlace(adminBlogDto.AuthorImage, existingBlog.AuthorImagePath, FolderName.Blogs_AuthorImages);
-                    if (fileUpdateResult.Item1 != (int)FileStatus.Success)
-                    {
-                        _logger.LogWarning("Failed to update author image for Blog with ID: {BlogID}", id);
-                        return BadRequest(fileUpdateResult.Item2);
-                    }
-                    existingBlog.AuthorImagePath = fileUpdateResult.Item2;
-                }
-
-                _mapper.Map(adminBlogDto, existingBlog);
-                existingBlog.Id = id; // Explicitly set the Id just to assert control over it.
-
-                _repositoryService.Update(existingBlog);
-                await _repositoryService.SaveAsync();
-
-                _logger.LogInformation("Blog with ID: {BlogID} updated successfully.", id);
-                return NoContent();
+                return Ok(result);
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (ApplicationException ex)
             {
-                _logger.LogError(ex, "Concurrency conflict when updating Blog with ID: {BlogID}", id);
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error when updating Blog with ID: {BlogID}", id);
-                return StatusCode(500, "A database error occurred while updating the Blog.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating Blog with ID: {BlogID}", id);
-                return StatusCode(500, "An error occurred while updating the Blog.");
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -160,68 +119,12 @@ namespace HMS.Controllers.Admin
                     return BadRequest(ModelState);
                 }
 
-                Tuple<int, string, string> fileSaveResult;
-                string? coverImageFilePath = default;
-                string? coverImageFileName = default;
-
-                if (adminBlogDto.CoverImage != null)
-                {
-                    fileSaveResult = _imageFileService.SaveFileFolder(adminBlogDto.CoverImage, FolderName.Blogs_CoverImages);
-                    if (fileSaveResult.Item1 == (int)FileStatus.Success)
-                    {
-                        coverImageFilePath = fileSaveResult.Item2;
-                        coverImageFileName = fileSaveResult.Item3;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Image file unsaved.");
-                        return BadRequest(ModelState);
-                    }
-                }
-
-                string? authorImageFilePath = default;
-                string? authorImageFileName = default;
-
-                if (adminBlogDto.AuthorImage != null)
-                {
-                    fileSaveResult = _imageFileService.SaveFileFolder(adminBlogDto.AuthorImage, FolderName.Blogs_AuthorImages);
-                    if (fileSaveResult.Item1 == (int)FileStatus.Success)
-                    {
-                        authorImageFilePath = fileSaveResult.Item2;
-                        authorImageFileName = fileSaveResult.Item3;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Image file unsaved.");
-                        return BadRequest(ModelState);
-                    }
-                }
-                AdminBlog adminBlog = _mapper.Map<AdminBlog>(adminBlogDto);
-                adminBlog.CoverImagePath = coverImageFilePath ?? string.Empty;
-                adminBlog.AuthorImagePath = authorImageFilePath ?? string.Empty;
-                await _repositoryService.InsertAsync(adminBlog);
-
-                AdminBlogReturnDTO resultDto = _mapper.Map<AdminBlogReturnDTO>(adminBlog);
-                _logger.LogInformation("Successfully created a new AdminBlog with ID: {BlogId}", adminBlog.Id);
-
-                return CreatedAtAction("GetBlog", new { id = adminBlog.Id }, resultDto);
+                var result = await _mappingService.PostBlog(adminBlogDto);
+                return CreatedAtAction("GetBlog", new { id = result.Id }, result);
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (ApplicationException ex)
             {
-                _logger.LogError(ex, "Concurrency conflict when creating a new Blog.");
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                // Log database update exceptions
-                _logger.LogError(ex, "Database update error occurred while creating a new Blog.");
-                return StatusCode(500, "A database error occurred while creating the Blog.");
-            }
-            catch (Exception ex)
-            {
-                // Log unexpected exceptions
-                _logger.LogError(ex, "An unexpected error occurred while creating a new Blog.");
-                return StatusCode(500, "An unexpected error occurred.");
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -231,37 +134,14 @@ namespace HMS.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Attempting to delete Blog with ID: {BlogID}", id);
-
-                var blog = await _repositoryService.GetByIdAsync(id);
-                if (blog == null)
-                {
-                    _logger.LogWarning("Blog with ID: {BlogID} not found", id);
-                    return NotFound();
-                }
-
-                _imageFileService.DeleteImage(blog.AuthorImagePath);
-                _imageFileService.DeleteImage(blog.CoverImagePath);
-
-                await _repositoryService.DeleteAsync(blog);
-                _logger.LogInformation("Successfully deleted Blog with ID: {BlogID}", id);
-
-                return NoContent();
+                _logger.LogInformation("Attempting to delete Blog with ID: {BlogId}", id);
+                await _mappingService.DeleteBlog(id);
+                return Ok($"Blog with ID {id} deleted successfully.");
             }
-            catch (DbUpdateConcurrencyException ex)
+            catch (ApplicationException ex)
             {
-                _logger.LogError(ex, "Concurrency conflict when deleting Blog with ID: {BlogId}", id);
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error when deleting Blog with ID: {BlogId}", id);
-                return StatusCode(500, "A database error occurred while deleting the contact.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred when deleting Blog with ID: {BlogId}", id);
-                return StatusCode(500, "An unexpected error occurred.");
+                _logger.LogError(ex, "An error occurred while deleting Blog with ID: {BlogId}", id);
+                return StatusCode(500, "An error occurred while while deleting Blog.");
             }
         }
     }
