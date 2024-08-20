@@ -12,8 +12,9 @@ namespace HMS.Controllers
     {
         protected readonly ILogger<TController> _logger;
         protected readonly IMapper _mapper;
-        protected readonly IRepositoryService<TEntity> _repositoryService;
-        protected readonly IAdminRepositoryService _adminRepository;
+        protected readonly IRepositoryService<TEntity> _repositoryService; //this variable is not required in this context 
+        protected readonly IAdminRepositoryService _adminRepository;  //this variable is not required in this context 
+        protected readonly IAdminMASRepositoryService _adminMASRepositoryService;
 
         // Constructor for general repository service
         public HMSControllerBase(ILogger<TController> logger, IRepositoryService<TEntity> repositoryService, IMapper mapper)
@@ -30,6 +31,14 @@ namespace HMS.Controllers
             _adminRepository = adminRepositoryService ?? throw new ArgumentNullException(nameof(adminRepositoryService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
+        public HMSControllerBase(ILogger<TController> logger, IAdminMASRepositoryService adminMASRepositoryService, IMapper mapper)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _adminMASRepositoryService = adminMASRepositoryService ?? throw new ArgumentNullException(nameof(adminMASRepositoryService));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
     }
 }
+
 

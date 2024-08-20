@@ -26,6 +26,8 @@ namespace HMS.Models
         public DbSet<AdminContact> AdminContacts { get; set; }
         public DbSet<AdminBlog> AdminBlogs { get; set; }
         public DbSet<AdminFAQ> AdminFAQs { get; set; }
+        public DbSet<AdminMealsAndServices> AdminMealsAndServices { get; set; }
+        public DbSet<AdminMealsAndServicesValue>AdminMealsAndServicesValues { get; set; }
 
 
 
@@ -73,10 +75,14 @@ namespace HMS.Models
                 .HasMany(c => c.AdminCategoryValues)
                 .WithOne(cv => cv.AdminCategory)
                 .HasForeignKey(cv => cv.AdminCategoryId)
+                .OnDelete(DeleteBehavior.Cascade); //what happen to categoryvalues if AdminCategory values is deleted
+
+            modelBuilder.Entity<AdminMealsAndServices>()
+                .HasMany(ms => ms.AdminMealsAndServicesValue)
+                .WithOne(sv => sv.AdminMealsAndServices)
+                .HasForeignKey(sv => sv.AdminMealsAndServicesId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //what happen to categoryvalues if AdminCategory values is deleted
-
-        }      
+        }
     }
 }
