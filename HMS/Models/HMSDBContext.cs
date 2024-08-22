@@ -1,5 +1,4 @@
 ﻿using HMS.DTOs;
-using HMS.DTOs.Admin;
 using HMS.Models.Admin;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,13 +8,14 @@ namespace HMS.Models
 {
     public class HMSDBContext : IdentityDbContext<IdentityUser>
     {
-        public HMSDBContext(DbContextOptions<HMSDBContext> options):base(options)
+        public HMSDBContext(DbContextOptions<HMSDBContext> options) : base(options)
         {
-                
+
         }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<AdminRoomImage> AdminRoomImages { get; set; }
 
         //Admin
         public DbSet<AdminRoom> AdminRooms { get; set; }
@@ -27,7 +27,7 @@ namespace HMS.Models
         public DbSet<AdminBlog> AdminBlogs { get; set; }
         public DbSet<AdminFAQ> AdminFAQs { get; set; }
         public DbSet<AdminMealsAndServices> AdminMealsAndServices { get; set; }
-        public DbSet<AdminMealsAndServicesValue>AdminMealsAndServicesValues { get; set; }
+        public DbSet<AdminMealsAndServicesValue> AdminMealsAndServicesValues { get; set; }
 
 
 
@@ -53,17 +53,21 @@ namespace HMS.Models
             modelBuilder.Entity<IdentityRoleClaim<string>>()
                 .ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
 
-           modelBuilder.Entity<AdminRoom>()
-                .HasMany(ar => ar.CategoryValues)
-                .WithOne(ac => ac.AdminRoom)
-                .HasForeignKey(ac => ac.AdminRoomId)
-                .OnDelete(DeleteBehavior.Cascade); // Optional: define cascade delete behavior
+            modelBuilder.Entity<AdminRoom>()
+                 .HasMany(ar => ar.CategoryValues)
+                 .WithOne(ac => ac.AdminRoom)
+                 .HasForeignKey(ac => ac.AdminRoomId)
+                 .OnDelete(DeleteBehavior.Cascade); // Optional: define cascade delete behavior
 
             modelBuilder.Entity<AdminRoom>()
-                .HasMany(ar => ar.ServiceAddons)
+                .HasOne(ar => ar.ServiceAddon)
                 .WithOne(sa => sa.AdminRoom)
-                .HasForeignKey(sa => sa.AdminRoomId)
+                .HasForeignKey<AdminServiceAddon>(sa => sa.AdminRoomId)
                 .OnDelete(DeleteBehavior.Cascade); // Optional: define set null behavior
+
+            modelBuilder.Entity<AdminRoom>()
+            .Property(a => a.Price)
+            .HasColumnType("DECIMAL(18, 2)");
 
             //modelBuilder.Entity<AdminRoom>()
             //    .HasMany(ar => ar.AdditionalInfo)
@@ -83,6 +87,22 @@ namespace HMS.Models
                 .HasForeignKey(sv => sv.AdminMealsAndServicesId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<AdminRoom>()
+                .HasMany(r => r.AdminRoomImages)
+                .WithOne(i => i.AdminRoom)
+                .HasForeignKey(i => i.AdminRoomId);
+
+            modelBuilder.Entity<AdminRoomImage>()
+            .Property(b => b.IsCoverImage)
+            .HasDefaultValue(false);
+            //what happen to categoryvalues if AdminCategory values is deleted
+
+            //mapping IS-A relationship TPT Table Per Type way
+            modelBuilder.Entity<AdminRoomImage>().ToTable("AdminRoomImages");
+
         }
+
+
+
     }
 }
