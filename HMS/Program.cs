@@ -75,11 +75,16 @@ internal class Program
 
         builder.Services.AddScoped<IRepositoryService<Contact>, ContactsRepositoryService>();
         builder.Services.AddScoped<IAdminRepositoryService, AdminRoomRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<AdminContact>, AdminContactRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<AdminFAQ>, AdminFAQRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<Room>, RoomRepositoryService>();
         builder.Services.AddScoped<IRepositoryService<Image>, ImageRepositoryService>();
         builder.Services.AddTransient<IFileService, ImageFileService>();
         builder.Services.AddScoped<IRepositoryService<AdminBlog>, AdminBlogRepositoryService>();
-        builder.Services.AddScoped<IRepositoryService<AdminRoomImage>, AdminRoomImageRepositoryService>();
+        builder.Services.AddScoped<IRepositoryService<AdminRoomImage>, AdminRoomImageRepositoryService>();        builder.Services.AddScoped<IRepositoryService<AdminRoomImage>, AdminRoomImageRepositoryService>();        builder.Services.AddScoped<IRepositoryService<AdminMealsAndServices>, AdminMealsAndServiceRepositoryService >();
+        builder.Services.AddScoped<IAdminMASRepositoryService, AdminMealsAndServiceRepositoryService>();
+
+
         builder.Services.AddScoped<AdminRoomMappingService>();
         builder.Services.AddScoped<AdminBlogMappingService>();
         //builder.Services.AddSingleton(typeof(ILogger), typeof(ILogger<Program>));

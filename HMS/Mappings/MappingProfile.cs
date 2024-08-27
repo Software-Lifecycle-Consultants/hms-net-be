@@ -35,6 +35,17 @@ namespace HMS.Mappings
             CreateMap<AdminRoomSummaryDTO, AdminRoom>().ReverseMap();
             CreateMap<AdminContactDTO, AdminContact>().ReverseMap();
             CreateMap<AdminFAQDTO, AdminFAQ>().ReverseMap();
+            CreateMap<AdminMealsAndServicesDTO, AdminMealsAndServices>().ReverseMap();
+            CreateMap<AdminMealsAndServicesValuesDTO, AdminMealsAndServicesValue>().ReverseMap();
+
+            CreateMap<AdminRoomImage, AdminRoomImageReturnDTO>()
+             .ForMember(dest => dest.RoomId, opt => opt.MapFrom(src => src.AdminRoomId))
+             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+             .ForMember(dest => dest.FilePath, opt => opt.MapFrom(src => src.FilePath))
+             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+             .ForMember(dest => dest.IsCoverImage, opt => opt.MapFrom(src => src.IsCoverImage));
+            CreateMap<AdminRoomCoverImageDTO, AdminRoomImage>();
+            CreateMap<AdminRoomGalleryImagesDTO, AdminRoomImage>();
 
             CreateMap<AdminRoomImage, AdminRoomImageReturnDTO>()
              .ForMember(dest => dest.RoomId, opt => opt.MapFrom(src => src.AdminRoomId))
