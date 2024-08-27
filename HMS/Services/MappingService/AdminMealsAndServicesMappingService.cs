@@ -4,6 +4,7 @@ using HMS.Models.Admin;
 using HMS.Services.Repository_Service;
 using HMS.Services.RepositoryService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HMS.Services.MappingService
 {
@@ -19,7 +20,7 @@ namespace HMS.Services.MappingService
             _logger = logger;
         }
 
-        public async Task<ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>>> GetAdminMealsAndServices()
+        public async Task<ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>>?> GetAdminMealsAndServicesAsync()
         {
             try
             {
@@ -28,7 +29,7 @@ namespace HMS.Services.MappingService
                 if (adminMealsAndServices == null || !adminMealsAndServices.Any())
                 {
                     _logger.LogInformation("No AdminMealsAndServicesValues found.");
-                    return NotFound("No AdminMealsAndServicesValues available.");
+                    return null;
                 }
                 var adminMealsAndServicesReturnDTOs = new List<AdminMealsAndServicesReturnDTO>();
 
@@ -44,23 +45,126 @@ namespace HMS.Services.MappingService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching all AdminMealsAndServicesValues.");
-                return StatusCode(500, "An error occurred while retrieving AdminMealsAndServicesValues.");
+                throw;
             }
         }
 
-        private async Task<AdminMealsAndServicesValuesDTO?> GetAdminMealsAndServicesValuesDTOs(AdminMealsAndServices adminMealAndService)
+        public async Task<AdminMealsAndServicesReturnDTO?> GetAdminMealsAndServicesByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var adminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
+
+                if (adminMealsAndServices == null)
+                {
+                    _logger.LogWarning("AdminMealsAndServices with ID {AdminMealsAndServicesId} not found", id);
+                    return null;
+                }
+
+                var adminMealsAndServicesDTO = _mapper.Map<AdminMealsAndServicesReturnDTO>(adminMealsAndServices);
+                adminMealsAndServicesDTO.AdminMealsAndServicesValues = await GetAdminMealsAndServicesValuesDTOs(adminMealsAndServices);
+
+                return adminMealsAndServicesDTO;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching AdminMealsAndServices by ID: {AdminMealsAndServicesId}", id);
+                throw;
+            }
         }
 
-        private ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>> StatusCode(int v1, string v2)
+
+        public async Task<bool> PutAdminMealsAndServicesAsync(int id, AdminMealsAndServicesDTO adminMealsAndServicesDTO)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingAdminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
+
+                if (existingAdminMealsAndServices == null)
+                {
+                    _logger.LogWarning("AdminMealsAndServices with ID {AdminMealsAndServicesId} not found for update.", id);
+                    return false;
+                }
+
+                _mapper.Map(adminMealsAndServicesDTO, existingAdminMealsAndServices);
+                existingAdminMealsAndServices.Id = id; // Explicitly set the Id just to assert control over it.
+
+                _adminMASRepositoryService.Update(existingAdminMealsAndServices);
+                await _adminMASRepositoryService.SaveAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
+                throw;
+            }
         }
 
-        private ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>> NotFound(string v)
+        public async Task<AdminMealsAndServicesReturnDTO> PostAdminMealsAndServicesAsync(AdminMealsAndServicesDTO adminMealsAndServicesDTO)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var adminMealsAndServices = _mapper.Map<AdminMealsAndServices>(adminMealsAndServicesDTO);
+
+                List<AdminMealsAndServicesValue> mealsAndServicesValues = new List<AdminMealsAndServicesValue>();
+                foreach (var item in adminMealsAndServicesDTO.AdminMealsAndServicesValues)
+                {
+                    AdminMealsAndServicesValue adminMealsAndServicesValue = _mapper.Map<AdminMealsAndServicesValue>(item);
+                    mealsAndServicesValues.Add(adminMealsAndServicesValue);
+                }
+
+                adminMealsAndServices.AdminMealsAndServicesValue = mealsAndServicesValues;
+
+                await _adminMASRepositoryService.InsertAsync(adminMealsAndServices);
+
+                var resultDto = _mapper.Map<AdminMealsAndServicesReturnDTO>(adminMealsAndServices);
+                return resultDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new AdminMealsAndServices.");
+                throw;
+            }
         }
+
+        public async Task<bool> DeleteAdminMealsAndServicesAsync(int id)
+        {
+            try
+            {
+                var adminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
+
+                if (adminMealsAndServices == null)
+                {
+                    _logger.LogWarning("AdminMealsAndServices with ID {AdminMealsAndServicesId} not found", id);
+                    return false;
+                }
+
+                await _adminMASRepositoryService.DeleteAsync(adminMealsAndServices);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
+                throw;
+            }
+        }
+
+        private async Task<List<AdminMealsAndServicesValuesDTO>> GetAdminMealsAndServicesValuesDTOs(AdminMealsAndServices adminMealsAndServices)
+        {
+            try
+            {
+                var mealsAndServicesValues = adminMealsAndServices.AdminMealsAndServicesValue;
+                var mealsAndServicesValuesDTOs = _mapper.Map<List<AdminMealsAndServicesValuesDTO>>(mealsAndServicesValues);
+                return await Task.FromResult(mealsAndServicesValuesDTOs);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching AdminMealsAndServices values.");
+                throw;
+            }
+        }
+
     }
 }

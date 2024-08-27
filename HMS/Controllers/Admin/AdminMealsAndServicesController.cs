@@ -28,48 +28,51 @@ namespace HMS.Controllers.Admin
 
         // GET: api/AdminMealsAndServices
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>>> GetAdminMealsAndServices()
+        public async Task<ActionResult<IEnumerable<AdminMealsAndServicesReturnDTO>>> GetAdminMealsAndServicesAsync()
         {
             try
             {
-                var adminMealsAndServicesReturnDTOs = await _mappingService.GetAdminMealsAndServices();
+                _logger.LogInformation("Fetching all AdminMealsAndServices.");
+                var adminMealsAndServicesDTOs = await _mappingService.GetAdminMealsAndServicesAsync();
 
-                if (!adminMealsAndServicesReturnDTOs.Any())
+                if (adminMealsAndServicesDTOs == null || !adminMealsAndServicesDTOs.Any())
                 {
-                    return NotFound("No AdminRooms available.");
+
+                    return NotFound("AdminMealsAndServices available.");
                 }
 
-                return Ok(adminMealsAndServicesReturnDTOs);
+                return Ok(adminMealsAndServicesDTOs);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching all AdminRooms.");
-                return StatusCode(500, "An error occurred while retrieving AdminRooms.");
+                _logger.LogError(ex, "An error occurred while fetching all AdminMealsAndServices.");
+                return StatusCode(500, "An error occurred while retrieving AdminMealsAndServices.");
             }
 
         }
 
         // GET: api/AdminMealsAndServices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminMealsAndServicesDTO>> GetAdminMealsAndServices(int id)
+        public async Task<ActionResult<AdminMealsAndServicesReturnDTO>> GetAdminMealsAndServices(int id)
         {
             try
             {
-                _logger.LogInformation("Fetching AdminMealsAndServicesValues by ID: {AdminMealsAndServicesId}", id);
-                var adminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
+                _logger.LogInformation("Fetching AdminMealsAndServices by ID: {AdminMealsAndServicesId}", id);
 
-                if (adminMealsAndServices == null)
+                var adminMealsAndServicesDTO = await _mappingService.GetAdminMealsAndServicesByIdAsync(id);
+
+                if (adminMealsAndServicesDTO == null)
                 {
-                    _logger.LogWarning("AdminMealsAndServicesValues with ID {AdminMealsAndServicesId} not found", id);
-                    return NotFound("AdminMealsAndServicesValues not found.");
+                    _logger.LogWarning("AdminMealsAndServices with ID {AdminMealsAndServicesId} not found.", id);
+                    return NotFound("AdminMealsAndServices not found.");
                 }
-                var adminMealsAndServicesDTO = _mapper.Map<AdminMealsAndServicesDTO>(adminMealsAndServices);
+
                 return Ok(adminMealsAndServicesDTO);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching AdminMealsAndServicesValues by ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(500, "An error occurred while retrieving AdminMealsAndServicesValues.");
+                _logger.LogError(ex, "An error occurred while fetching AdminMealsAndServices by ID: {AdminMealsAndServicesId}", id);
+                return StatusCode(500, "An error occurred while retrieving AdminMealsAndServices.");
             }
         }
 
@@ -80,91 +83,56 @@ namespace HMS.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Updating AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
+                _logger.LogInformation("Updating AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Invalid model state for updating AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
+                    _logger.LogWarning("Invalid model state for updating AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
                     return BadRequest(ModelState);
                 }
 
-                var existingAdminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
-                if (existingAdminMealsAndServices == null)
+                var updateSuccess = await _mappingService.PutAdminMealsAndServicesAsync(id, adminMealsAndServicesDTO);
+
+                if (!updateSuccess)
                 {
-                    _logger.LogWarning("AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId} not found for update.", id);
-                    return NotFound($"No AdminMealsAndServicesValues found with ID {id}.");
+                    _logger.LogWarning("AdminMealsAndServices with ID: {AdminMealsAndServicesId} not found for update.", id);
+                    return NotFound($"No AdminMealsAndServices found with ID {id}.");
                 }
 
-                _mapper.Map(adminMealsAndServicesDTO, existingAdminMealsAndServices);
-                existingAdminMealsAndServices.Id = id; // Explicitly set the Id just to assert control over it.
-
-                _adminMASRepositoryService.Update(existingAdminMealsAndServices);
-                await _adminMASRepositoryService.SaveAsync();
-
-                _logger.LogInformation("AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId} updated successfully.", id);
+                _logger.LogInformation("AdminMealsAndServices with ID: {AdminMealsAndServicesId} updated successfully.", id);
                 return NoContent();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogError(ex, "Concurrency conflict when updating AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error when updating AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(500, "A database error occurred while updating the AdminMealsAndServicesValues.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(500, "An error occurred while updating the AdminMealsAndServicesValues.");
+                _logger.LogError(ex, "An error occurred while updating AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
+                return StatusCode(500, "An error occurred while updating the AdminMealsAndServices.");
             }
         }
 
         // POST: api/AdminMealsAndServices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AdminMealsAndServices>> PostAdminMealsAndServices(AdminMealsAndServicesDTO adminMealsAndServicesDTO)
+        public async Task<ActionResult<AdminMealsAndServicesReturnDTO>> PostAdminMealsAndServices(AdminMealsAndServicesDTO adminMealsAndServicesDTO)
         {
             try
             {
-                _logger.LogInformation("Attempting to create a new AdminMealsAndServicesValues.");
+                _logger.LogInformation("Attempting to create a new AdminMealsAndServices.");
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Invalid model state for creating a new AdminMealsAndServicesValues");
+                    _logger.LogWarning("Invalid model state for creating a new AdminMealsAndServices.");
                     return BadRequest(ModelState);
                 }
 
-                AdminMealsAndServices adminMealsAndServices = _mapper.Map<AdminMealsAndServices>(adminMealsAndServicesDTO);
-                List<AdminMealsAndServicesValue> mealsandservicesValues = new List<AdminMealsAndServicesValue>();
-                foreach (var item in adminMealsAndServicesDTO.AdminMealsAndServicesValues)
-                {
-                    AdminMealsAndServicesValue adminMealsAndServicesvalue = _mapper.Map<AdminMealsAndServicesValue>(item);
-                    mealsandservicesValues.Add(adminMealsAndServicesvalue);
-                }
-                
-                adminMealsAndServices.AdminMealsAndServicesValue = mealsandservicesValues;
-                await _adminMASRepositoryService.InsertAsync(adminMealsAndServices);
+                var createdAdminMealsAndServicesDTO = await _mappingService.PostAdminMealsAndServicesAsync(adminMealsAndServicesDTO);
 
-                var resultDto = _mapper.Map<AdminMealsAndServicesDTO>(adminMealsAndServices);
-                _logger.LogInformation("Successfully created a new AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", adminMealsAndServices.Id);
+                _logger.LogInformation("Successfully created a new AdminMealsAndServices with ID: {AdminMealsAndServicesId}", createdAdminMealsAndServicesDTO.Id);
 
-                return CreatedAtAction("GetAdminMealsAndServices", new { id = adminMealsAndServices.Id }, resultDto);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogError(ex, "Concurrency conflict when creating a new AdminMealsAndServicesValues.");
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error occurred while creating a new AdminMealsAndServicesValues.");
-                return StatusCode(500, "A database error occurred while creating the AdminMealsAndServicesValues.");
+                return CreatedAtAction("GetAdminMealsAndServices", new { id = createdAdminMealsAndServicesDTO.Id }, createdAdminMealsAndServicesDTO);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred while creating a new AdminMealsAndServicesValues.");
+                _logger.LogError(ex, "An error occurred while creating a new AdminMealsAndServices.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -175,33 +143,22 @@ namespace HMS.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Attempting to delete AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
+                _logger.LogInformation("Attempting to delete AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
 
-                var adminMealsAndServices = await _adminMASRepositoryService.GetByIdAsync(id);
-                if (adminMealsAndServices == null)
+                var deleteSuccess = await _mappingService.DeleteAdminMealsAndServicesAsync(id);
+
+                if (!deleteSuccess)
                 {
-                    _logger.LogWarning("AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId} not found", id);
+                    _logger.LogWarning("AdminMealsAndServices with ID: {AdminMealsAndServicesId} not found.", id);
                     return NotFound();
                 }
 
-                await _adminMASRepositoryService.DeleteAsync(adminMealsAndServices);
-                _logger.LogInformation("Successfully deleted AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-
+                _logger.LogInformation("Successfully deleted AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
                 return NoContent();
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                _logger.LogError(ex, "Concurrency conflict when deleting AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(409, "Concurrency conflict occurred.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Database update error when deleting AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
-                return StatusCode(500, "A database error occurred while deleting the AdminMealsAndServicesValues.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unexpected error occurred when deleting AdminMealsAndServicesValues with ID: {AdminMealsAndServicesId}", id);
+                _logger.LogError(ex, "An error occurred while deleting AdminMealsAndServices with ID: {AdminMealsAndServicesId}", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }

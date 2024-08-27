@@ -9,4 +9,11 @@ namespace HMS.DTOs.Admin
         public string Title { get; set; } = string.Empty;
         public List<AdminMealsAndServicesValuesDTO>? AdminMealsAndServicesValues { get; set; }
     }
+
+    public class AdminMealsAndServicesReturnDTO
+    {
+        public string Title { get; set; } = string.Empty;
+        public List<AdminMealsAndServicesValuesDTO>? AdminMealsAndServicesValues { get; set; }
+        public object Id { get; internal set; }
+    }
 }

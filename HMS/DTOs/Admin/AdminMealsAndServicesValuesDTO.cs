@@ -9,11 +9,4 @@ namespace HMS.DTOs.Admin
     {
         public string Value { get; set; } = string.Empty;
     }
-
-    public class AdminMealsAndServicesReturnDTO
-    {
-        public string Value { get; set; } = string.Empty;
-
-        public AdminMealsAndServicesValuesDTO? AdminMealsAndServicesValues { get; set; }
-    }
 }
